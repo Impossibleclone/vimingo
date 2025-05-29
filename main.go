@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell/v2"
 	"log"
 	"os"
+	"github.com/gdamore/tcell/v2"
 )
 
 func main() {
@@ -74,10 +74,12 @@ func main() {
 				case 'q':
 					quit()
 				}
-				// ... other Normal mode keys
 			case Insert:
 				switch {
 				case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
+					if cursor.X == 0 {
+						RemoveLine(buffer)
+					}
 					if cursor.X > 0 {	
 					cursor.MoveLeft()
 						buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y],cursor.X) //delete a character and update the line
@@ -85,7 +87,10 @@ func main() {
 				
 				case ev.Key() == tcell.KeyEscape :
 					mode.SwitchTo(Normal)
-				 
+				
+				case ev.Key() == tcell.KeyEnter , ev.Key() == tcell.KeyCR:
+					NewLine(buffer)
+
 				case ev.Rune() != 0 :
 					r := ev.Rune() //save the typed character
 					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y],cursor.X,r) //update the line 

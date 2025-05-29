@@ -75,14 +75,24 @@ func main() {
 					quit()
 				}
 				// ... other Normal mode keys
-            case Insert:
-                if ev.Key() == tcell.KeyEscape {
-                    mode.SwitchTo(Normal)
-                }
-                // ... insert mode keys
-            
+			case Insert:
+				switch {
+				case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
+					if cursor.X > 0 {	
+					cursor.MoveLeft()
+						buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y],cursor.X) //delete a character and update the line
+					}
+				
+				case ev.Key() == tcell.KeyEscape :
+					mode.SwitchTo(Normal)
+				 
+				case ev.Rune() != 0 :
+					r := ev.Rune() //save the typed character
+					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y],cursor.X,r) //update the line 
+					cursor.MoveRight(buffer) //increment the position of the cursor in X.
+				}
 			}
-			
+
 		}
 		screen.Clear()
 		for y, line := range buf.Lines{

@@ -8,6 +8,22 @@ import (
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		log.Fatal("Are you Dumb!!!")
+	}
+
+	filename := os.Args[1]
+	buf, err := LoadFile(filename)
+	if err != nil {
+		log.Fatalf("failed to open file: %v",err)
+	}
+
+	buffer := &Buffer{
+		Lines: buf.Lines,
+		Cursor: &Cursor{X:0,Y:0},
+		Mode: Normal,
+		}
+
 	screen, err := tcell.NewScreen()
 	if err != nil {
 		log.Fatalf("Error creating screen: %v", err)
@@ -22,8 +38,10 @@ func main() {
 	screen.Clear()
 	screen.Show()
 
-	cur := &Cursor{X: 0, Y: 0}
-	MaxW, MaxH := screen.Size()
+	// cur := &Cursor{X: 0, Y: 0}
+	cursor := buffer.Cursor
+
+	// MaxW, MaxH := screen.Size()
 	screen.SetContent(0, 0, 'g', nil, tcell.StyleDefault)
 	fmt.Println("UYS was here")
 	quit := func() {
@@ -37,7 +55,7 @@ func main() {
 		switch ev := ev.(type) {
 		case *tcell.EventResize:
 			screen.Sync()
-			MaxW, MaxH = screen.Size()
+			// MaxW, MaxH = screen.Size()
 		case *tcell.EventKey:
 			switch mode.Current() {
             case Normal:
@@ -46,13 +64,13 @@ func main() {
                     mode.SwitchTo(Insert)
                 // switch ev.Rune() {
 				case 'h':
-					cur.MoveLeft()
+					cursor.MoveLeft()
 				case 'j':
-					cur.MoveDown(MaxH)
+					cursor.MoveDown(buffer)
 				case 'k':
-					cur.MoveUp()
+					cursor.MoveUp(buffer)
 				case 'l':
-					cur.MoveRight(MaxW)
+					cursor.MoveRight(buffer)
 				case 'q':
 					quit()
 				}
@@ -67,7 +85,13 @@ func main() {
 			
 		}
 		screen.Clear()
-		screen.SetContent(cur.X, cur.Y, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
+		for y, line := range buf.Lines{
+			for x, r := range line {
+				screen.SetContent(x,y,r,nil,tcell.StyleDefault)
+			}
+		}
+
+		screen.SetContent(cursor.X, cursor.Y, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
 		screen.Show()
 	}
 }

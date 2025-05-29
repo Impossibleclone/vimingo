@@ -12,21 +12,33 @@ func (c *Cursor) MoveLeft() {
     }
 }
 
-func (c *Cursor) MoveRight(MaxW int) {
-	if c.X < MaxW -1  {
+func (c *Cursor) MoveRight(buffer *Buffer) {
+	if c.Y >= len(buffer.Lines) {
+		return
+	}
+
+	if c.X < len(buffer.Lines[c.Y])  {
 		c.X++
 	}
 }
 
-func (c *Cursor) MoveUp() {
+func (c *Cursor) MoveUp(buffer *Buffer) {
 	if c.Y > 0 {
 		c.Y--
+		linelen := len(buffer.Lines[c.Y])
+		if c.X > linelen {
+			c.X = linelen
+		}
 	}
 }
 
-func (c *Cursor) MoveDown(MaxH int) {
-	if c.Y < MaxH-1 {
+func (c *Cursor) MoveDown(buffer *Buffer) {
+	if c.Y < len(buffer.Lines)-1 {
 		c.Y++
+		linelen := len(buffer.Lines[c.Y])
+		if c.X > linelen{
+			c.X = linelen
+		}
 	}
 }
 

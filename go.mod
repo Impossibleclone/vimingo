@@ -1,4 +1,4 @@
-module github.com/impossibleclone/td
+module github.com/impossibleclone/UYS
 
 go 1.24.2
 

@@ -6,6 +6,7 @@ type Mode int
 const (
     Normal Mode = iota
     Insert
+	Command
 )
 
 // currnt mode

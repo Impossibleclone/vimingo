@@ -32,3 +32,5 @@ func RemoveLine(buffer *Buffer) {
 		buffer.Cursor.X = len(prevLine)
 	}
 }
+
+

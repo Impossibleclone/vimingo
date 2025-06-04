@@ -19,13 +19,20 @@ func main() {
 		log.Fatalf("failed to open file: %v",err)
 	}
 
+	if len(buf.Lines) == 0 {
+		buf.Lines = append(buf.Lines, "")	//we can't edit empty buffer err: index out of range [0] with length 0 
+	}
+
 	buffer := &Buffer{
 		Filename: filename,	
 		Lines: buf.Lines,
 		Cursor: &Cursor{X:0,Y:0},
 		Mode: Normal,
-		
+		ScrollX: 0,
+		ScrollY: 0,
 		}
+	
+	
 
 	screen, err := tcell.NewScreen()
 	if err != nil {
@@ -44,7 +51,7 @@ func main() {
 	// cur := &Cursor{X: 0, Y: 0}
 	cursor := buffer.Cursor
 
-	// MaxW, MaxH := screen.Size()
+	_, screenH := screen.Size()
 	screen.SetContent(0, 0, 'g', nil, tcell.StyleDefault)
 	fmt.Println("UYS was here")
 	quit := func() {
@@ -59,37 +66,44 @@ func main() {
 		case *tcell.EventResize:
 			screen.Sync()
 			// MaxW, MaxH = screen.Size()
+		
 		case *tcell.EventKey:
 			switch mode.Current() {
-            case Normal:
+            
+//NormalMode
+
+			case Normal:
                 switch ev.Rune() {
                 case 'i':
                     mode.SwitchTo(Insert)
-                case ':':
+                
+				case ':':
 					mode.SwitchTo(Command)
 					buffer.Command = nil
 				// switch ev.Rune() {
+				
 				case 'h':
 					cursor.MoveLeft()
+				
 				case 'j':
 					cursor.MoveDown(buffer)
+					adjustScroll(buffer, screenH)
+
 				case 'k':
 					cursor.MoveUp(buffer)
+					adjustScroll(buffer, screenH)
+
 				case 'l':
 					cursor.MoveRight(buffer)
+				
 				case 'q':
 					quit()
 				}
+			
+//insertMode
+
 			case Insert:
 				switch {
-				case ev.Key() == tcell.KeyEnter , ev.Key() == tcell.KeyCR:
-					NewLine(buffer)
-
-				case ev.Rune() != 0 :
-					r := ev.Rune() //save the typed character
-					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y],cursor.X,r) //update the line 
-					cursor.MoveRight(buffer) //increment the position of the cursor in X.
-				
 				case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
 					if cursor.X == 0 {
 						RemoveLine(buffer)
@@ -99,9 +113,20 @@ func main() {
 						buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y],cursor.X) //delete a character and update the line
 					}
 				
+				case ev.Key() == tcell.KeyEnter , ev.Key() == tcell.KeyCR:
+					NewLine(buffer)
+
+				
 				case ev.Key() == tcell.KeyEscape :
 					mode.SwitchTo(Normal)
+				
+				case ev.Rune() != 0 :
+					r := ev.Rune() //save the typed character
+					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y],cursor.X,r) //update the line 
+					cursor.MoveRight(buffer) //increment the position of the cursor in X.
 				}
+				
+//CommandMode			
 				
 			case Command:
 				switch {
@@ -132,22 +157,32 @@ func main() {
 					r:= ev.Rune() //preserve the typed character
 					buffer.Command = append(buffer.Command, r)
 				
-				
 				}
 			}
 
 		}
 		screen.Clear()
-		for y, line := range buffer.Lines{
+		
+		for y := 0; y < screenH; y++ {
+			lineIndex := y + buffer.ScrollY
+			if lineIndex >= len(buffer.Lines) {
+				break
+			}
+			line := buffer.Lines[lineIndex]
 			for x, r := range line {
-				screen.SetContent(x,y,r,nil,tcell.StyleDefault)
+				screen.SetContent(x, y, r, nil, tcell.StyleDefault)
 			}
 		}
 
-		for i, r := range buffer.Command {
-			screen.SetContent(i, buffer.Cursor.Y+1, r, nil, tcell.StyleDefault)
+
+		
+		if mode.Current() == Command {
+			for i, r := range buffer.Command {
+				screen.SetContent(i, screenH-1, r, nil, tcell.StyleDefault)
+			}
 		}
-		screen.SetContent(cursor.X, cursor.Y, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
+
+		screen.SetContent(cursor.X, cursor.Y - buffer.ScrollY, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
 		screen.Show()
 	}
 }

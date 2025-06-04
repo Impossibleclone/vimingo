@@ -33,4 +33,10 @@ func RemoveLine(buffer *Buffer) {
 	}
 }
 
-
+func adjustScroll(buffer *Buffer, screenH int) {
+    if buffer.Cursor.Y < buffer.ScrollY {
+        buffer.ScrollY = buffer.Cursor.Y
+    } else if buffer.Cursor.Y >= buffer.ScrollY + screenH {
+        buffer.ScrollY = buffer.Cursor.Y - screenH + 1
+    }
+}

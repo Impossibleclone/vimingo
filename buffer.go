@@ -11,6 +11,8 @@ type Buffer struct {
 	Cursor  *Cursor
 	Mode 	Mode
 	Command []rune
+	ScrollX int
+	ScrollY int
 }
 
 func LoadFile(filename string) (*Buffer, error) {

@@ -43,4 +43,3 @@ func (c *Cursor) MoveDown(buffer *Buffer) {
 }
 
 
-

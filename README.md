@@ -18,7 +18,7 @@ Installation
 Clone the repo:
 
     git clone https://github.com/impossibleclone/uys.git
-    cd go-text-editor
+    cd uys
 
 Build the project:
 

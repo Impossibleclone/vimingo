@@ -69,7 +69,6 @@ func main() {
 			switch mode.Current() {
 
 			//NormalMode
-
 			case Normal:
 				switch ev.Rune() {
 				//To switch to InsertMode
@@ -91,7 +90,6 @@ func main() {
 				case ':':
 					mode.SwitchTo(Command)
 					buffer.Command = nil
-				// switch ev.Rune() {
 
 				case 'h':
 					cursor.MoveLeft()
@@ -111,8 +109,7 @@ func main() {
 					quit()
 				}
 
-				//insertMode
-
+			//insertMode
 			case Insert:
 				switch {
 				case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
@@ -130,10 +127,25 @@ func main() {
 				case ev.Key() == tcell.KeyEscape, ev.Key() == tcell.KeyCtrlC:
 					mode.SwitchTo(Normal)
 
+				//Logic for Typing:
 				case ev.Rune() != 0:
 					r := ev.Rune()                                                       //save the typed character
 					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y], cursor.X, r) //update the line
 					cursor.MoveRight(buffer)                                             //increment the position of the cursor in X.
+
+				case ev.Key() == tcell.KeyLeft:
+					cursor.MoveLeft()
+
+				case ev.Key() == tcell.KeyDown:
+					cursor.MoveDown(buffer)
+					adjustScroll(buffer, screenH)
+
+				case ev.Key() == tcell.KeyUp:
+					cursor.MoveUp(buffer)
+					adjustScroll(buffer, screenH)
+
+				case ev.Key() == tcell.KeyRight:
+					cursor.MoveRight(buffer)
 				}
 
 				//CommandMode

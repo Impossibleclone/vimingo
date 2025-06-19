@@ -19,6 +19,9 @@ func (c *Cursor) MoveRight(buffer *Buffer) {
 
 	if c.X < len(buffer.Lines[c.Y])  {
 		c.X++
+	}else if c.Y+1 < len(buffer.Lines){
+		c.Y++
+		c.X = 0
 	}
 }
 

@@ -7,6 +7,7 @@ const (
     Normal Mode = iota
     Insert
 	Command
+	Visual
 )
 
 // currnt mode

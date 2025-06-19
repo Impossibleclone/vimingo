@@ -16,23 +16,21 @@ func main() {
 	filename := os.Args[1]
 	buf, err := LoadFile(filename)
 	if err != nil {
-		log.Fatalf("failed to open file: %v",err)
+		log.Fatalf("failed to open file: %v", err)
 	}
 
 	if len(buf.Lines) == 0 {
-		buf.Lines = append(buf.Lines, "")	//we can't edit empty buffer err: index out of range [0] with length 0 
+		buf.Lines = append(buf.Lines, "") //we can't edit empty buffer err: index out of range [0] with length 0
 	}
 
 	buffer := &Buffer{
-		Filename: filename,	
-		Lines: buf.Lines,
-		Cursor: &Cursor{X:0,Y:0},
-		Mode: Normal,
-		ScrollX: 0,
-		ScrollY: 0,
-		}
-	
-	
+		Filename: filename,
+		Lines:    buf.Lines,
+		Cursor:   &Cursor{X: 0, Y: 0},
+		Mode:     Normal,
+		ScrollX:  0,
+		ScrollY:  0,
+	}
 
 	screen, err := tcell.NewScreen()
 	if err != nil {
@@ -66,25 +64,38 @@ func main() {
 		case *tcell.EventResize:
 			screen.Sync()
 			// MaxW, MaxH = screen.Size()
-		
+
 		case *tcell.EventKey:
 			switch mode.Current() {
-            
-//NormalMode
+
+			//NormalMode
 
 			case Normal:
-                switch ev.Rune() {
-                case 'i':
-                    mode.SwitchTo(Insert)
-                
+				switch ev.Rune() {
+				//To switch to InsertMode
+				case 'i':
+					mode.SwitchTo(Insert)
+
+				//to edit after the cursor.
+				case 'a':
+					cursor.MoveRight(buffer)
+					mode.SwitchTo(Insert)
+
+				//to edit on a new line.
+				case 'o':
+					mode.SwitchTo(Insert)
+					cursor.MoveDown(buffer)
+					NewLine(buffer)
+					cursor.MoveUp(buffer)
+
 				case ':':
 					mode.SwitchTo(Command)
 					buffer.Command = nil
 				// switch ev.Rune() {
-				
+
 				case 'h':
 					cursor.MoveLeft()
-				
+
 				case 'j':
 					cursor.MoveDown(buffer)
 					adjustScroll(buffer, screenH)
@@ -95,12 +106,12 @@ func main() {
 
 				case 'l':
 					cursor.MoveRight(buffer)
-				
+
 				case 'q':
 					quit()
 				}
-			
-//insertMode
+
+				//insertMode
 
 			case Insert:
 				switch {
@@ -108,61 +119,59 @@ func main() {
 					if cursor.X == 0 {
 						RemoveLine(buffer)
 					}
-					if cursor.X > 0 {	
-					cursor.MoveLeft()
-						buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y],cursor.X) //delete a character and update the line
+					if cursor.X > 0 {
+						cursor.MoveLeft()
+						buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
 					}
-				
-				case ev.Key() == tcell.KeyEnter , ev.Key() == tcell.KeyCR:
+
+				case ev.Key() == tcell.KeyEnter, ev.Key() == tcell.KeyCR:
 					NewLine(buffer)
 
-				
-				case ev.Key() == tcell.KeyEscape :
+				case ev.Key() == tcell.KeyEscape, ev.Key() == tcell.KeyCtrlC:
 					mode.SwitchTo(Normal)
-				
-				case ev.Rune() != 0 :
-					r := ev.Rune() //save the typed character
-					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y],cursor.X,r) //update the line 
-					cursor.MoveRight(buffer) //increment the position of the cursor in X.
+
+				case ev.Rune() != 0:
+					r := ev.Rune()                                                       //save the typed character
+					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y], cursor.X, r) //update the line
+					cursor.MoveRight(buffer)                                             //increment the position of the cursor in X.
 				}
-				
-//CommandMode			
-				
+
+				//CommandMode
+
 			case Command:
 				switch {
-				case ev.Key() == tcell.KeyEnter , ev.Key() == tcell.KeyCR:
-					
+				case ev.Key() == tcell.KeyEnter, ev.Key() == tcell.KeyCR:
+
 					cmd := string(buffer.Command)
 
-					switch cmd{
-					case "w" :
-						fmt.Println("Saving...")
+					switch cmd {
+					case "w":
 						SaveFile(filename, buffer)
 						mode.SwitchTo(Normal)
 						buffer.Command = nil
 
-					case "q" :
+					case "q":
 						quit()
 
-					case "wq" :
+					case "wq":
 						SaveFile(filename, buffer)
 						quit()
 					}
 					buffer.Command = nil
 
-				case ev.Key() == tcell.KeyEscape :
+				case ev.Key() == tcell.KeyEscape:
 					mode.SwitchTo(Normal)
 
-				case ev.Rune() != 0 :
-					r:= ev.Rune() //preserve the typed character
+				case ev.Rune() != 0:
+					r := ev.Rune() //preserve the typed character
 					buffer.Command = append(buffer.Command, r)
-				
+
 				}
 			}
 
 		}
 		screen.Clear()
-		
+
 		for y := 0; y < screenH; y++ {
 			lineIndex := y + buffer.ScrollY
 			if lineIndex >= len(buffer.Lines) {
@@ -174,15 +183,13 @@ func main() {
 			}
 		}
 
-
-		
 		if mode.Current() == Command {
 			for i, r := range buffer.Command {
 				screen.SetContent(i, screenH-1, r, nil, tcell.StyleDefault)
 			}
 		}
 
-		screen.SetContent(cursor.X, cursor.Y - buffer.ScrollY, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
+		screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
 		screen.Show()
 	}
 }

@@ -162,6 +162,30 @@ func main() {
 					} else {
 						mode.SwitchTo(Normal)
 					}
+				case 'y':
+					//after a little thought and bringing out the notebook figured out single line.
+					// var start int
+					// var end int
+					// if visualStart.Y < cursor.Y {
+					// 	start = visualStart.X
+					// 	end = cursor.X
+					// } else {
+					// 	start = cursor.X
+					// 	end = visualStart.X
+					// }
+					// startline := min(visualStart.Y, cursor.Y)
+					// endline := max(visualStart.Y, cursor.Y)
+					// buffer.Register = ""
+					// toYankFromLines := buffer.Lines[visualStart.Y]
+					// toYankTheCharacters := []rune(toYankFromLines[start:end])
+					// buffer.Register = string(toYankTheCharacters)
+
+					//first try
+					// buffer.Register = ""
+					// highlighted := []rune(buffer.Lines[cursor.Y])
+					// ch := string(highlighted[cursor.X])
+					// buffer.Register += ch
+					// fmt.Println(buffer.Register)
 
 				case 'h':
 					cursor.MoveLeft()
@@ -229,10 +253,6 @@ func main() {
 				style := tcell.StyleDefault
 
 				if mode.Current() == Visual && isInSelection(visualStart, *cursor, x, lineIndex) {
-					highlighted := []rune(buffer.Lines[y])
-					ch := string(highlighted[x])
-					buffer.Register += ch
-					fmt.Println(buffer.Register)
 					style = style.Reverse(true)
 				}
 

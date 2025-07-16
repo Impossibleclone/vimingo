@@ -13,6 +13,7 @@ type Buffer struct {
 	Command []rune
 	ScrollX int
 	ScrollY int
+	Register string
 }
 
 func LoadFile(filename string) (*Buffer, error) {

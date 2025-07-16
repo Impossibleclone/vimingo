@@ -8,6 +8,10 @@ func RemoveCh(line string, pos int) string {
 	return line[:pos] + line[pos+1:]
 }
 
+// func yank(line string, pos int) string {
+// 	return line[:pos] 
+// }
+
 func SplitLine(line string, pos int) (before string, after string) {
 	return line[:pos], line[pos:]
 }

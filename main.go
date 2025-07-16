@@ -10,7 +10,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("Are you Dumb!!!")
+		log.Fatal("Please read the instructions properly.")
 	}
 
 	filename := os.Args[1]
@@ -31,6 +31,8 @@ func main() {
 		ScrollX:  0,
 		ScrollY:  0,
 	}
+
+	visualStart := Cursor{X: 0, Y: 0} // default value
 
 	screen, err := tcell.NewScreen()
 	if err != nil {
@@ -72,6 +74,10 @@ func main() {
 			case Normal:
 				switch ev.Rune() {
 				//To switch to InsertMode
+				case 'v':
+					visualStart = *cursor
+					mode.SwitchTo(Visual)
+
 				case 'i':
 					mode.SwitchTo(Insert)
 
@@ -147,8 +153,34 @@ func main() {
 				case ev.Key() == tcell.KeyRight:
 					cursor.MoveRight(buffer)
 				}
+			case Visual:
+				switch ev.Rune() {
+				case 'v':
+					if mode.Current() == Normal {
+						mode.SwitchTo(Visual)
+						visualStart = *cursor
+					} else {
+						mode.SwitchTo(Normal)
+					}
 
-				//CommandMode
+				case 'h':
+					cursor.MoveLeft()
+
+				case 'j':
+					cursor.MoveDown(buffer)
+					adjustScroll(buffer, screenH)
+
+				case 'k':
+					cursor.MoveUp(buffer)
+					adjustScroll(buffer, screenH)
+
+				case 'l':
+					cursor.MoveRight(buffer)
+					// line := buffer.Lines[cursor.Y]
+					// screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, rune(line[cursor.X]), nil, tcell.StyleDefault.Reverse(true))
+				}
+
+			//CommandMode
 
 			case Command:
 				switch {
@@ -190,9 +222,23 @@ func main() {
 				break
 			}
 			line := buffer.Lines[lineIndex]
+			// for x, r := range line {
+			// 	screen.SetContent(x, y, r, nil, tcell.StyleDefault)
+			// }
 			for x, r := range line {
-				screen.SetContent(x, y, r, nil, tcell.StyleDefault)
+				style := tcell.StyleDefault
+
+				if mode.Current() == Visual && isInSelection(visualStart, *cursor, x, lineIndex) {
+					highlighted := []rune(buffer.Lines[y])
+					ch := string(highlighted[x])
+					buffer.Register += ch
+					fmt.Println(buffer.Register)
+					style = style.Reverse(true)
+				}
+
+				screen.SetContent(x, y, r, nil, style)
 			}
+
 		}
 
 		if mode.Current() == Command {
@@ -201,7 +247,8 @@ func main() {
 			}
 		}
 
-		screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
+		// screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
+		screen.ShowCursor(cursor.X, cursor.Y-buffer.ScrollY)
 		screen.Show()
 	}
 }

@@ -18,7 +18,7 @@ func Paste(buffer *Buffer, yankedText string) {
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[0])
 				buffer.Cursor.X += len(lines[i])
 				NewLine(buffer)
-			} else if i > 0 && i < len(lines){
+			} else if i > 0 && i < len(lines) {
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[i])
 				buffer.Cursor.X = len(lines[i])
 			}

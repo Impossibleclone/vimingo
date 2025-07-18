@@ -30,6 +30,7 @@ func main() {
 		Mode:     Normal,
 		ScrollX:  0,
 		ScrollY:  0,
+		Register: "",
 	}
 
 	visualStart := Cursor{X: 0, Y: 0} // default value
@@ -78,6 +79,9 @@ func main() {
 					visualStart = *cursor
 					mode.SwitchTo(Visual)
 
+				case 'p':
+					Paste(buffer, buffer.Register)
+
 				case 'i':
 					mode.SwitchTo(Insert)
 
@@ -111,8 +115,8 @@ func main() {
 				case 'l':
 					cursor.MoveRight(buffer)
 
-				case 'q':
-					quit()
+					// case 'q':
+					// 	quit()
 				}
 
 			//insertMode
@@ -166,16 +170,8 @@ func main() {
 						mode.SwitchTo(Normal)
 					}
 				case ev.Rune() == 'y':
-					//finally figured it out now it is yanking in the register.
-					var start int
-					var end int
-					if visualStart.Y < cursor.Y {
-						start = visualStart.X
-						end = cursor.X
-					} else {
-						start = cursor.X
-						end = visualStart.X
-					}
+					start := min(visualStart.X, cursor.X)
+					end := max(visualStart.X, cursor.X)
 					startline := min(visualStart.Y, cursor.Y)
 					endline := max(visualStart.Y, cursor.Y)
 					buffer.Register = ""
@@ -205,30 +201,16 @@ func main() {
 							}
 						}
 					}
-					fmt.Println(buffer.Register) //to check if it is yanking appropriately.
-					//after a little thought and bringing out the notebook figured out single line.
-					// var start int
-					// var end int
-					// if visualStart.Y < cursor.Y {
-					// 	start = visualStart.X
-					// 	end = cursor.X
-					// } else {
-					// 	start = cursor.X
-					// 	end = visualStart.X
-					// }
-					// startline := min(visualStart.Y, cursor.Y)
-					// endline := max(visualStart.Y, cursor.Y)
-					// buffer.Register = ""
-					// toYankFromLines := buffer.Lines[visualStart.Y]
-					// toYankTheCharacters := []rune(toYankFromLines[start:end])
-					// buffer.Register = string(toYankTheCharacters)
+					cursor.Y = startline
+					cursor.X = start
+					mode.SwitchTo(Normal)
 
-					//first try
-					// buffer.Register = ""
-					// highlighted := []rune(buffer.Lines[cursor.Y])
-					// ch := string(highlighted[cursor.X])
-					// buffer.Register += ch
-					// fmt.Println(buffer.Register)
+				case ev.Key() == ':':
+					mode.SwitchTo(Command)
+
+					buffer.Command = nil
+				case ev.Rune() == 'p':
+					Paste(buffer, buffer.Register)
 
 				case ev.Rune() == 'h':
 					cursor.MoveLeft()

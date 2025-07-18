@@ -1,7 +1,34 @@
 package main
 
+import "strings"
+
 func TypeCh(line string, pos int, ch rune) string {
 	return line[:pos] + string(ch) + line[pos:]
+}
+func insertText(line string, pos int, text string) string {
+	return line[:pos] + text + line[pos:]
+}
+func Paste(buffer *Buffer, yankedText string) {
+	lines := strings.Split(yankedText, "\n")
+	if len(lines) == 1 {
+		buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[0])
+	} else if len(lines) > 1 {
+		for i := 0; i < len(lines); i++ {
+			if i == 0 {
+				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[0])
+				buffer.Cursor.X += len(lines[i])
+				NewLine(buffer)
+			} else if i > 0 && i < len(lines){
+				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[i])
+				buffer.Cursor.X = len(lines[i])
+			}
+		}
+
+	}
+	// for i := 1; i < len(lines); i++ {
+	// 	NewLine(buffer)
+	// 	buffer.Lines[buffer.Cursor.Y] = lines[i]
+	// }
 }
 
 func RemoveCh(line string, pos int) string {
@@ -38,9 +65,9 @@ func RemoveLine(buffer *Buffer) {
 }
 
 func adjustScroll(buffer *Buffer, screenH int) {
-    if buffer.Cursor.Y < buffer.ScrollY {
-        buffer.ScrollY = buffer.Cursor.Y
-    } else if buffer.Cursor.Y >= buffer.ScrollY + screenH {
-        buffer.ScrollY = buffer.Cursor.Y - screenH + 1
-    }
+	if buffer.Cursor.Y < buffer.ScrollY {
+		buffer.ScrollY = buffer.Cursor.Y
+	} else if buffer.Cursor.Y >= buffer.ScrollY+screenH {
+		buffer.ScrollY = buffer.Cursor.Y - screenH + 1
+	}
 }

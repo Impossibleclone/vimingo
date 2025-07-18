@@ -154,15 +154,58 @@ func main() {
 					cursor.MoveRight(buffer)
 				}
 			case Visual:
-				switch ev.Rune() {
-				case 'v':
+				switch {
+				case ev.Key() == tcell.KeyEscape, ev.Key() == tcell.KeyCtrlC:
+					mode.SwitchTo(Normal)
+
+				case ev.Rune() == 'v':
 					if mode.Current() == Normal {
 						mode.SwitchTo(Visual)
 						visualStart = *cursor
 					} else {
 						mode.SwitchTo(Normal)
 					}
-				case 'y':
+				case ev.Rune() == 'y':
+					//finally figured it out now it is yanking in the register.
+					var start int
+					var end int
+					if visualStart.Y < cursor.Y {
+						start = visualStart.X
+						end = cursor.X
+					} else {
+						start = cursor.X
+						end = visualStart.X
+					}
+					startline := min(visualStart.Y, cursor.Y)
+					endline := max(visualStart.Y, cursor.Y)
+					buffer.Register = ""
+					if startline == endline {
+
+						toYankFromLine := buffer.Lines[startline]
+						toYankTheCharacters := []rune(toYankFromLine[start:end])
+						buffer.Register = string(toYankTheCharacters)
+					} else {
+						for y := startline; y <= endline; y++ {
+							if y == startline {
+								toYankFromLine := buffer.Lines[y]
+								toYankTheCharacters := []rune(toYankFromLine[start:])
+								buffer.Register += string(toYankTheCharacters)
+								buffer.Register += "\n"
+
+							} else if y == endline {
+								toYankFromLine := buffer.Lines[y]
+								toYankTheCharacters := []rune(toYankFromLine[:end])
+								buffer.Register += string(toYankTheCharacters)
+
+							} else {
+								toYankFromLine := buffer.Lines[y]
+								toYankTheCharacters := []rune(toYankFromLine[:])
+								buffer.Register += string(toYankTheCharacters)
+								buffer.Register += "\n"
+							}
+						}
+					}
+					fmt.Println(buffer.Register) //to check if it is yanking appropriately.
 					//after a little thought and bringing out the notebook figured out single line.
 					// var start int
 					// var end int
@@ -187,18 +230,18 @@ func main() {
 					// buffer.Register += ch
 					// fmt.Println(buffer.Register)
 
-				case 'h':
+				case ev.Rune() == 'h':
 					cursor.MoveLeft()
 
-				case 'j':
+				case ev.Rune() == 'j':
 					cursor.MoveDown(buffer)
 					adjustScroll(buffer, screenH)
 
-				case 'k':
+				case ev.Rune() == 'k':
 					cursor.MoveUp(buffer)
 					adjustScroll(buffer, screenH)
 
-				case 'l':
+				case ev.Rune() == 'l':
 					cursor.MoveRight(buffer)
 					// line := buffer.Lines[cursor.Y]
 					// screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, rune(line[cursor.X]), nil, tcell.StyleDefault.Reverse(true))

@@ -33,10 +33,25 @@ Usage
 Start the editor with a file name (existing or new).
 
 Press i to enter Insert mode and start typing.
+other mappings are also available like:
+
+a to insert after cursor.
+
+A to insert at the end of line.
+
+o to insert at a new line below.
+
+O to insert at a new line above.
 
 Use arrow keys or h, j, k, l to move cursor.
 
 Press Esc to switch back to Normal mode.
+
+Press v to switch to Visual mode:
+
+y to yank
+
+p to paste
 
 Press : to enter Command mode:
 

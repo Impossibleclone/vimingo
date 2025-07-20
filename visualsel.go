@@ -15,7 +15,7 @@ func isInSelection(start, end Cursor, x, y int) bool {
     } else if y == start.Y {
         return x >= start.X
     } else if y == end.Y {
-        return x < end.X
+        return x <= end.X
     }
 
     return true

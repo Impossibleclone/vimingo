@@ -193,7 +193,7 @@ func main() {
 					if startline == endline {
 
 						toYankFromLine := buffer.Lines[startline]
-						toYankTheCharacters := []rune(toYankFromLine[start:end])
+						toYankTheCharacters := []rune(toYankFromLine[start : end+1])
 						buffer.Register = string(toYankTheCharacters)
 					} else {
 						for y := startline; y <= endline; y++ {

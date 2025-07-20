@@ -12,7 +12,20 @@ func (c *Cursor) MoveLeft() {
     }
 }
 
-func (c *Cursor) MoveRight(buffer *Buffer) {
+func (c *Cursor) MoveRightinNormal(buffer *Buffer) {
+	if c.Y >= len(buffer.Lines) {
+		return
+	}
+
+	if c.X < len(buffer.Lines[c.Y])-1  {
+		c.X++
+	}else if c.Y+1 < len(buffer.Lines){
+		// c.Y++
+		return
+		// c.X = 0
+	}
+}
+func (c *Cursor) MoveRightinInsert(buffer *Buffer) {
 	if c.Y >= len(buffer.Lines) {
 		return
 	}
@@ -20,8 +33,9 @@ func (c *Cursor) MoveRight(buffer *Buffer) {
 	if c.X < len(buffer.Lines[c.Y])  {
 		c.X++
 	}else if c.Y+1 < len(buffer.Lines){
-		c.Y++
-		c.X = 0
+		// c.Y++
+		return
+		// c.X = 0
 	}
 }
 

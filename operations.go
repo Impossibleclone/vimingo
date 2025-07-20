@@ -14,11 +14,15 @@ func Paste(buffer *Buffer, yankedText string) {
 		buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[0])
 	} else if len(lines) > 1 {
 		for i := 0; i < len(lines); i++ {
-			if i == 0 {
+			if i == 0 { //for the first line yanked
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[0])
 				buffer.Cursor.X += len(lines[i])
 				NewLine(buffer)
-			} else if i > 0 && i < len(lines) {
+			} else if i > 0 && i < len(lines)-1 { //for the middle lines 
+				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[i])
+				buffer.Cursor.X = len(lines[i])
+				NewLine(buffer)
+			} else if i > 0 && i < len(lines) { //for the last line 
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[i])
 				buffer.Cursor.X = len(lines[i])
 			}

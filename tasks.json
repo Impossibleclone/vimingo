@@ -3,28 +3,28 @@
         "ID": 1,
         "Title": "actually make it yourself!!",
         "Completed": true
-    }
- {
+    },
+    {
         "ID": 2,
         "Title": "undo/redo",
         "Completed": false
-    }
- {
+    },
+    {
         "ID": 3,
         "Title": "show files if no file specified",
         "Completed": false
-    }
- {
+    },
+    {
         "ID": 4,
         "Title": "Some more ways to insert mode",
         "Completed": true
-    }
- {
+    },
+    {
         "ID": 5,
         "Title": "Copy/Paste Obviously ,I didn't forget",
         "Completed": true
-    }
- {
+    },
+    {
         "ID": 6,
         "Title": "Visual mode",
         "Completed": true

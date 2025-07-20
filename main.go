@@ -85,17 +85,32 @@ func main() {
 				case 'i':
 					mode.SwitchTo(Insert)
 
+				case 'I':
+					cursor.X = 0
+					mode.SwitchTo(Insert)
+
 				//to edit after the cursor.
 				case 'a':
-					cursor.MoveRight(buffer)
+					mode.SwitchTo(Insert)
+					cursor.MoveRightinInsert(buffer)
+
+				case 'A':
+					cursor.X = len(buffer.Lines[cursor.Y])
 					mode.SwitchTo(Insert)
 
 				//to edit on a new line.
+				case 'O':
+					cursor.X = 0
+					NewLine(buffer)
+					cursor.Y--
+					mode.SwitchTo(Insert)
+
 				case 'o':
 					mode.SwitchTo(Insert)
-					cursor.MoveDown(buffer)
+					cursor.X = len(buffer.Lines[cursor.Y])
+					// cursor.MoveDown(buffer)
 					NewLine(buffer)
-					cursor.MoveUp(buffer)
+					// cursor.MoveUp(buffer)
 
 				case ':':
 					mode.SwitchTo(Command)
@@ -113,7 +128,7 @@ func main() {
 					adjustScroll(buffer, screenH)
 
 				case 'l':
-					cursor.MoveRight(buffer)
+					cursor.MoveRightinNormal(buffer)
 
 					// case 'q':
 					// 	quit()
@@ -141,7 +156,7 @@ func main() {
 				case ev.Rune() != 0:
 					r := ev.Rune()                                                       //save the typed character
 					buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y], cursor.X, r) //update the line
-					cursor.MoveRight(buffer)                                             //increment the position of the cursor in X.
+					cursor.MoveRightinInsert(buffer)                                     //increment the position of the cursor in X.
 
 				case ev.Key() == tcell.KeyLeft:
 					cursor.MoveLeft()
@@ -155,7 +170,7 @@ func main() {
 					adjustScroll(buffer, screenH)
 
 				case ev.Key() == tcell.KeyRight:
-					cursor.MoveRight(buffer)
+					cursor.MoveRightinInsert(buffer)
 				}
 			case Visual:
 				switch {
@@ -224,7 +239,7 @@ func main() {
 					adjustScroll(buffer, screenH)
 
 				case ev.Rune() == 'l':
-					cursor.MoveRight(buffer)
+					cursor.MoveRightinNormal(buffer)
 					// line := buffer.Lines[cursor.Y]
 					// screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, rune(line[cursor.X]), nil, tcell.StyleDefault.Reverse(true))
 				}

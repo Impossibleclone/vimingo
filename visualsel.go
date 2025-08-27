@@ -20,4 +20,3 @@ func isInSelection(start, end Cursor, x, y int) bool {
 
     return true
 }
-

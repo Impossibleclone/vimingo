@@ -1,4 +1,4 @@
-vimingo (Go Text Editor)
+vimingo
 
 A simple terminal-based text editor written in Go using the tcell package.
 Features

@@ -13,6 +13,8 @@ Scrolling support for large files
 
 Cursor navigation with h, j, k, l keys in Normal mode
 
+A functional Status Line with Current Mode, File Name, Cursor Coordinates
+
 Installation
 
 Clone the repo:

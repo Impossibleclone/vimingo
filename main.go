@@ -280,30 +280,25 @@ func main() {
 		}
 		screen.Clear()
 
-		for y := 0; y < screenH; y++ {
+		for y := 0; y < screenH-1; y++ {
 			lineIndex := y + buffer.ScrollY
 			if lineIndex >= len(buffer.Lines) {
 				break
 			}
 			line := buffer.Lines[lineIndex]
-			// for x, r := range line {
-			// 	screen.SetContent(x, y, r, nil, tcell.StyleDefault)
-			// }
 			for x, r := range line {
 				style := tcell.StyleDefault
-
 				if mode.Current() == Visual && isInSelection(visualStart, *cursor, x, lineIndex) {
 					style = style.Reverse(true)
 				}
-
 				screen.SetContent(x, y, r, nil, style)
 			}
-
 		}
 
 		if mode.Current() == Command {
+			screen.SetContent(0, screenH-1, ':', nil, tcell.StyleDefault)
 			for i, r := range buffer.Command {
-				screen.SetContent(i, screenH-1, r, nil, tcell.StyleDefault)
+				screen.SetContent(i+1, screenH-1, r, nil, tcell.StyleDefault)
 			}
 		}
 

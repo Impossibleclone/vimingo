@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -52,8 +51,6 @@ func main() {
 	// cur := &Cursor{X: 0, Y: 0}
 	cursor := buffer.Cursor
 
-	screen.SetContent(0, 0, 'g', nil, tcell.StyleDefault)
-	fmt.Println("UYS was here")
 	quit := func() {
 		screen.Fini()
 		os.Exit(0)

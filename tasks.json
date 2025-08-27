@@ -28,5 +28,10 @@
         "ID": 6,
         "Title": "Visual mode",
         "Completed": true
+    },
+    {
+        "ID": 7,
+        "Title": "Easy cursor navigation",
+        "Completed": true
     }
 ]

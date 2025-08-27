@@ -1,7 +1,7 @@
 vimingo
 
 A simple terminal-based text editor written in Go using the tcell package.
-Features
+Features implemented till now:
 
 Insert and command modes (similar to Vim)
 

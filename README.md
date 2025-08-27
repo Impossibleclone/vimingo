@@ -1,4 +1,4 @@
-UYS (Go Text Editor)
+vimingo (Go Text Editor)
 
 A simple terminal-based text editor written in Go using the tcell package.
 Features
@@ -17,16 +17,16 @@ Installation
 
 Clone the repo:
 
-    git clone https://github.com/impossibleclone/uys.git
-    cd uys
+    git clone https://github.com/impossibleclone/vimingo.git
+    cd vimingo
 
 Build the project:
 
-    go build -o uys
+    go build -o vmg
 
 Run the editor:
 
-    ./uys <filename>
+    ./vmg <filename>
 
 Usage
 

@@ -1,4 +1,4 @@
-module github.com/impossibleclone/UYS
+module github.com/impossibleclone/vimingo
 
 go 1.24.2
 

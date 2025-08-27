@@ -52,7 +52,7 @@ func main() {
 	// cur := &Cursor{X: 0, Y: 0}
 	cursor := buffer.Cursor
 
-	_, screenH := screen.Size()
+	screenW, screenH := screen.Size()
 	screen.SetContent(0, 0, 'g', nil, tcell.StyleDefault)
 	fmt.Println("UYS was here")
 	quit := func() {
@@ -248,8 +248,14 @@ func main() {
 
 			case Command:
 				switch {
+				case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
+					if len(buffer.Command) > 0 {
+						buffer.Command = buffer.Command[:len(buffer.Command)-1]
+					}
+
 				case ev.Key() == tcell.KeyEnter, ev.Key() == tcell.KeyCR:
 
+					fmt.Printf("Command: '%s'\n", string(buffer.Command))
 					cmd := string(buffer.Command)
 
 					switch cmd {
@@ -295,12 +301,29 @@ func main() {
 			}
 		}
 
-		if mode.Current() == Command {
-			screen.SetContent(0, screenH-1, ':', nil, tcell.StyleDefault)
-			for i, r := range buffer.Command {
-				screen.SetContent(i+1, screenH-1, r, nil, tcell.StyleDefault)
-			}
+		status := ""
+		if mode.Current() == Normal {
+			status = "-- NORMAL --"
+		} else if mode.Current() == Insert {
+			status = "-- INSERT --"
+		} else if mode.Current() == Command {
+			status = ":" + string(buffer.Command)
 		}
+
+		// clear bottom line first
+		for x := 0; x < screenW; x++ {
+			screen.SetContent(x, screenH-1, ' ', nil, tcell.StyleDefault)
+		}
+
+		for x, r := range status {
+			screen.SetContent(x, screenH-1, r, nil, tcell.StyleDefault)
+		}
+		// if mode.Current() == Command {
+		// 	screen.SetContent(0, screenH-1, ':', nil, tcell.StyleDefault)
+		// 	for i, r := range buffer.Command {
+		// 		screen.SetContent(i+1, screenH-1, r, nil, tcell.StyleDefault)
+		// 	}
+		// }
 
 		// screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, '█', nil, tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorBlue))
 		screen.ShowCursor(cursor.X, cursor.Y-buffer.ScrollY)

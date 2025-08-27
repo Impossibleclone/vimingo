@@ -22,7 +22,7 @@ Clone the repo:
 
 Build the project:
 
-    go build -o vmg
+    make build
 
 Run the editor:
 

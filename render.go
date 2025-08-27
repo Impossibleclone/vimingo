@@ -1,6 +1,9 @@
 package main
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"fmt"
+	"github.com/gdamore/tcell/v2"
+)
 
 func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode *EditorMode) {
 	screen.Clear()
@@ -24,9 +27,9 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 
 	status := ""
 	if mode.Current() == Normal {
-		status = "-- NORMAL --"
+		status = "-- NORMAL --" + " \\ " + buffer.Filename
 	} else if mode.Current() == Insert {
-		status = "-- INSERT --"
+		status = "-- INSERT --" + " \\ " + buffer.Filename
 	} else if mode.Current() == Command {
 		status = ":" + string(buffer.Command)
 	}
@@ -40,6 +43,12 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 		screen.SetContent(x, screenH-1, r, nil, tcell.StyleDefault)
 	}
 
+	coords := fmt.Sprintf("%d:%d", buffer.Cursor.Y+1, buffer.Cursor.X+1)
+	startcoords := screenW - len(coords)
+
+	for i, r := range coords {
+		screen.SetContent(startcoords+i, screenH-1, r, nil, tcell.StyleDefault)
+	}
 	screen.ShowCursor(buffer.Cursor.X, buffer.Cursor.Y-buffer.ScrollY)
 	screen.Show()
 }

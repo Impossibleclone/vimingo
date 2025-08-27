@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -17,6 +16,16 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 
 		//NormalMode
 		case Normal:
+			switch ev.Key() {
+			case tcell.KeyCtrlD:
+				cursor.HalfDown(buffer, screen)
+				adjustScroll(buffer, screenH)
+
+			case tcell.KeyCtrlU:
+				cursor.HalfUp(buffer, screen)
+				adjustScroll(buffer, screenH)
+
+			}
 			switch ev.Rune() {
 			//To switch to InsertMode
 			case 'v':
@@ -94,6 +103,9 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				NewLine(buffer)
 
 			case ev.Key() == tcell.KeyEscape, ev.Key() == tcell.KeyCtrlC:
+				if cursor.X > len(buffer.Lines[cursor.Y])-1 {
+					cursor.MoveLeft()
+				}
 				mode.SwitchTo(Normal)
 
 			//Logic for Typing:

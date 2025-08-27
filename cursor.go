@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/gdamore/tcell/v2"
+)
+
 type Cursor struct {
 	X    int
 	Y    int
@@ -49,8 +53,8 @@ func (c *Cursor) MoveUp(buffer *Buffer) {
 		linelen := len(buffer.Lines[c.Y])
 		if linelen == 0 {
 			c.X = linelen
-		} else if c.X > linelen || c.remX > linelen || c.remX == linelen{
-			c.X = linelen-1
+		} else if c.X > linelen || c.remX > linelen || c.remX == linelen {
+			c.X = linelen - 1
 		} else {
 			c.X = c.remX
 		}
@@ -63,8 +67,54 @@ func (c *Cursor) MoveDown(buffer *Buffer) {
 		linelen := len(buffer.Lines[c.Y])
 		if linelen == 0 {
 			c.X = linelen
-		} else if c.X > linelen || c.remX > linelen || c.remX == linelen{
-			c.X = linelen-1
+		} else if c.X > linelen || c.remX > linelen || c.remX == linelen {
+			c.X = linelen - 1
+		} else {
+			c.X = c.remX
+		}
+	}
+}
+
+func (c *Cursor) HalfDown(buffer *Buffer, screen tcell.Screen) {
+	if c.Y < len(buffer.Lines)-1 {
+		_, screenH := screen.Size()
+		half := screenH / 2
+		c.Y += half
+
+		if c.Y >= len(buffer.Lines) {
+			c.Y = len(buffer.Lines) - 1
+		}
+
+		linelen := len(buffer.Lines[c.Y])
+		if linelen == 0 {
+			c.X = linelen
+		} else if c.X > linelen || c.remX > linelen || c.remX == linelen {
+			c.X = linelen - 1
+		} else {
+			c.X = c.remX
+		}
+	}
+}
+
+func (c *Cursor) HalfUp(buffer *Buffer, screen tcell.Screen) {
+	_, screenH := screen.Size()
+	half := screenH / 2
+	if c.Y > 0 {
+		if c.Y < half {
+			c.Y = 0
+		} else {
+			c.Y -= half
+		}
+
+		if c.Y >= len(buffer.Lines) {
+			c.Y = len(buffer.Lines) - 1
+		}
+
+		linelen := len(buffer.Lines[c.Y])
+		if linelen == 0 {
+			c.X = linelen
+		} else if c.X > linelen || c.remX > linelen || c.remX == linelen {
+			c.X = linelen - 1
 		} else {
 			c.X = c.remX
 		}

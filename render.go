@@ -43,7 +43,7 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 		screen.SetContent(x, screenH-1, r, nil, tcell.StyleDefault)
 	}
 
-	coords := fmt.Sprintf("%d:%d", buffer.Cursor.Y+1, buffer.Cursor.X+1)
+	coords := fmt.Sprintf("%d:%d ", buffer.Cursor.Y+1, buffer.Cursor.X+1)
 	startcoords := screenW - len(coords)
 
 	for i, r := range coords {

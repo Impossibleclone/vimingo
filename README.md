@@ -49,6 +49,8 @@ Press Esc to switch back to Normal mode.
 
 Press v to switch to Visual mode:
 
+In Visual mode the h, j, k, l keys can be used to highlight the text.
+
     y to yank
 
     p to paste
@@ -66,7 +68,5 @@ Dependencies
     Go 1.20+
 
     tcell
-
-Contributing
 
 Contributions are welcome! Feel free to open issues or pull requests.

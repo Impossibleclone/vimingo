@@ -47,4 +47,3 @@ func SaveFile(filename string, buffer *Buffer) error {
 	}
 	return writer.Flush()
 }
-

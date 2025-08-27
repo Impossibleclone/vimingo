@@ -27,5 +27,3 @@ func (e *EditorMode) Current() Mode {
 func (e *EditorMode) SwitchTo(m Mode) {
     e.current = m
 }
-
-

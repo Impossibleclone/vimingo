@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -211,11 +213,32 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 
 			case ev.Key() == tcell.KeyEnter, ev.Key() == tcell.KeyCR:
 
-				cmd := string(buffer.Command)
+				cmds := strings.Fields(string(buffer.Command))
 
-				switch cmd {
+				//check if nothing is typed
+				if len(cmds) == 0 {
+					mode.SwitchTo(Normal)
+					buffer.Command = nil
+					return
+				}
+
+				switch cmds[0] {
 				case "w":
-					SaveFile(buffer.Filename, buffer)
+					if len(cmds) > 1 {
+						if err := SaveFile(cmds[1], buffer); err != nil {
+							buffer.StatusMsg = err.Error()
+						} else {
+							buffer.Filename = cmds[1]
+							buffer.StatusMsg = "Written " + buffer.Filename
+						}
+					} else {
+						if err := SaveFile(buffer.Filename, buffer); err != nil {
+							buffer.StatusMsg = err.Error()
+						} else {
+							buffer.StatusMsg = "Written " + buffer.Filename
+						}
+					}
+
 					mode.SwitchTo(Normal)
 					buffer.Command = nil
 
@@ -223,8 +246,14 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 					quit()
 
 				case "wq":
-					SaveFile(buffer.Filename, buffer)
-					quit()
+					if err := SaveFile(buffer.Filename, buffer); err != nil {
+						buffer.StatusMsg = err.Error()
+						mode.SwitchTo(Normal)
+						buffer.Command = nil
+					} else {
+						buffer.StatusMsg = "Written " + buffer.Filename
+						quit()
+					}
 				}
 				buffer.Command = nil
 

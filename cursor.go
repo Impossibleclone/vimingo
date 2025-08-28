@@ -120,3 +120,16 @@ func (c *Cursor) HalfUp(buffer *Buffer, screen tcell.Screen) {
 		}
 	}
 }
+
+func visualColumn(line []rune, runeIndex int, tabSize int) int {
+    col := 0
+    for i := 0; i < runeIndex && i < len(line); i++ {
+        if line[i] == '\t' {
+            spaces := tabSize - (col % tabSize)
+            col += spaces
+        } else {
+            col++
+        }
+    }
+    return col
+}

@@ -15,13 +15,27 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 		if lineIndex >= len(buffer.Lines) {
 			break
 		}
-		line := buffer.Lines[lineIndex]
-		for x, r := range line {
+		runes := []rune(buffer.Lines[lineIndex])
+		x := 0 // screen column
+
+		for rn := 0; rn < len(runes); rn++ {
+			r := runes[rn]
 			style := tcell.StyleDefault
+			tab := ' '
 			if mode.Current() == Visual && isInSelection(visualStart, *buffer.Cursor, x, lineIndex) {
 				style = style.Reverse(true)
 			}
-			screen.SetContent(x, y, r, nil, style)
+
+			if r == '\t' {
+				spaces := 4 - (x % 4)
+				for t := 0; t < spaces; t++ {
+					screen.SetContent(x, y, tab, nil, style)
+					x++
+				}
+			} else {
+				screen.SetContent(x, y, r, nil, style)
+				x++
+			}
 		}
 	}
 
@@ -33,7 +47,9 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 	} else if mode.Current() == Command {
 		status = ":" + string(buffer.Command)
 	}
-
+	if buffer.StatusMsg != "" && mode.Current() != Command {
+		status += " | " + buffer.StatusMsg
+	}
 	// clear bottom line first
 	for x := 0; x < screenW; x++ {
 		screen.SetContent(x, screenH-1, ' ', nil, tcell.StyleDefault)
@@ -43,12 +59,17 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 		screen.SetContent(x, screenH-1, r, nil, tcell.StyleDefault)
 	}
 
-	coords := fmt.Sprintf("%d:%d ", buffer.Cursor.Y+1, buffer.Cursor.X+1)
+	//define coordinates
+	coords := fmt.Sprintf("/ %d:%d ", buffer.Cursor.Y+1, buffer.Cursor.X+1)
 	startcoords := screenW - len(coords)
 
+	//render coordinates at bottom-right corner
 	for i, r := range coords {
 		screen.SetContent(startcoords+i, screenH-1, r, nil, tcell.StyleDefault)
 	}
-	screen.ShowCursor(buffer.Cursor.X, buffer.Cursor.Y-buffer.ScrollY)
+	//render cursor
+	atcol := visualColumn([]rune(buffer.Lines[buffer.Cursor.Y]), buffer.Cursor.X, 4)
+	screen.ShowCursor(atcol, buffer.Cursor.Y-buffer.ScrollY)
+
 	screen.Show()
 }

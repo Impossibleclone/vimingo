@@ -28,6 +28,7 @@ Build the project:
 
 Run the editor:
 
+    ./vmg 
     ./vmg <filename>
 
 Usage
@@ -58,6 +59,8 @@ In Visual mode the h, j, k, l keys can be used to highlight the text.
     p to paste
 
 Press : to enter Command mode:
+
+    :w filename.ext
 
     :w to save
 

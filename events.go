@@ -73,6 +73,8 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 
 			case 'h':
 				cursor.MoveLeft()
+			case '_':
+				cursor.X = 0 
 
 			case 'j':
 				cursor.MoveDown(buffer)
@@ -85,8 +87,58 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 			case 'l':
 				cursor.MoveRightinNormal(buffer)
 
-				// case 'q':
-				// 	quit()
+			case '$':
+				cursor.X = len(buffer.Lines[cursor.Y])-1
+
+			case 'd':
+				r := ev.Rune()
+				if buffer.KeyReg == nil {
+					buffer.KeyReg = append(buffer.KeyReg, r)
+				} else {
+					buffer.StatusMsg = "line deleted"
+					buffer.KeyReg = nil
+				}
+			case 'y':
+				r := ev.Rune()
+				if buffer.KeyReg == nil {
+					buffer.KeyReg = append(buffer.KeyReg, r)
+				} else {
+					buffer.KeyReg = nil
+				}
+			case 'w':
+				// r := ev.Rune()
+				// buffer.KeyReg = append(buffer.KeyReg, r)
+				if len(buffer.KeyReg) >0 &&  buffer.KeyReg[0] == 'd' {
+					buffer.StatusMsg = "word deleted"
+				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
+					// start := cursor.X
+					YankRange(buffer, cursor, wMotion(buffer, cursor))
+					buffer.StatusMsg = "yanked"
+					buffer.KeyReg = nil
+				}else {
+					movedcur := wMotion(buffer, cursor)
+					cursor.X = movedcur
+					if cursor.X == len(buffer.Lines[cursor.Y]){
+						cursor.X--
+					}
+				}
+			case 'e':
+				// r := ev.Rune()
+				// buffer.KeyReg = append(buffer.KeyReg, r)
+				if len(buffer.KeyReg) >0 &&  buffer.KeyReg[0] == 'd' {
+					buffer.StatusMsg = "deleted"
+				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
+					// start := cursor.X
+					YankRange(buffer, cursor, eMotion(buffer, cursor))
+					buffer.StatusMsg = "yanked"
+					buffer.KeyReg = nil
+				}else {
+					movedcur := eMotion(buffer, cursor)
+					cursor.X = movedcur
+					if cursor.X == len(buffer.Lines[cursor.Y]){
+						cursor.X--
+					}
+				}
 			}
 
 		//insertMode
@@ -143,39 +195,7 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 					mode.SwitchTo(Normal)
 				}
 			case ev.Rune() == 'y':
-				start := min(visualStart.X, cursor.X)
-				end := max(visualStart.X, cursor.X)
-				startline := min(visualStart.Y, cursor.Y)
-				endline := max(visualStart.Y, cursor.Y)
-				buffer.Register = ""
-				if startline == endline {
-
-					toYankFromLine := buffer.Lines[startline]
-					toYankTheCharacters := []rune(toYankFromLine[start : end+1])
-					buffer.Register = string(toYankTheCharacters)
-				} else {
-					for y := startline; y <= endline; y++ {
-						if y == startline {
-							toYankFromLine := buffer.Lines[y]
-							toYankTheCharacters := []rune(toYankFromLine[start:])
-							buffer.Register += string(toYankTheCharacters)
-							buffer.Register += "\n"
-
-						} else if y == endline {
-							toYankFromLine := buffer.Lines[y]
-							toYankTheCharacters := []rune(toYankFromLine[:end])
-							buffer.Register += string(toYankTheCharacters)
-
-						} else {
-							toYankFromLine := buffer.Lines[y]
-							toYankTheCharacters := []rune(toYankFromLine[:])
-							buffer.Register += string(toYankTheCharacters)
-							buffer.Register += "\n"
-						}
-					}
-				}
-				cursor.Y = startline
-				cursor.X = start
+				YankSelection(buffer, cursor, visualStart)
 				mode.SwitchTo(Normal)
 
 			case ev.Key() == ':':

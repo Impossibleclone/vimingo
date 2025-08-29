@@ -11,7 +11,14 @@ Command mode supports saving (:w), quitting (:q), and saving & quitting (:wq)
 
 Scrolling support for large files
 
-Cursor navigation with h, j, k, l keys in Normal mode
+Motion keys:
+    
+    h - Left
+    j - Down
+    k - Up
+    l - Right
+    w - Next word
+    e - End of Word
 
 A functional Status Line with Current Mode, File Name, Cursor Coordinates
 
@@ -52,7 +59,7 @@ Press Esc to switch back to Normal mode.
 
 Press v to switch to Visual mode:
 
-In Visual mode the h, j, k, l keys can be used to highlight the text.
+In Visual mode the motions can be used to highlight the text.
 
     y to yank
 

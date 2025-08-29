@@ -7,15 +7,16 @@ import (
 )
 
 type Buffer struct {
-	Filename string
-	Lines    []string
-	Cursor   *Cursor
-	Mode     Mode
-	Command  []rune
-	ScrollX  int
-	ScrollY  int
-	Register string
+	Filename  string
+	Lines     []string
+	Cursor    *Cursor
+	Mode      Mode
+	Command   []rune
+	ScrollX   int
+	ScrollY   int
+	Register  string
 	StatusMsg string
+	KeyReg    []rune
 }
 
 func LoadFile(filename string) (*Buffer, error) {

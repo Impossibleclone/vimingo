@@ -22,7 +22,7 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 			r := runes[rn]
 			style := tcell.StyleDefault
 			tab := ' '
-			if mode.Current() == Visual && isInSelection(visualStart, *buffer.Cursor, x, lineIndex) {
+			if mode.Current() == Visual && isInSelection(visualStart, *buffer.Cursor, rn, lineIndex) {
 				style = style.Reverse(true)
 			}
 
@@ -59,11 +59,19 @@ func RenderScreen(screen tcell.Screen, buffer *Buffer, visualStart Cursor, mode 
 		screen.SetContent(x, screenH-1, r, nil, tcell.StyleDefault)
 	}
 
+		
 	//define coordinates
 	coords := fmt.Sprintf("/ %d:%d ", buffer.Cursor.Y+1, buffer.Cursor.X+1)
 	startcoords := screenW - len(coords)
+	
+	operators := string(buffer.KeyReg)
+	startoperators := startcoords - len(coords)
+	// statusend := operators + coords
 
 	//render coordinates at bottom-right corner
+	for i, r := range operators {
+		screen.SetContent(startoperators+i, screenH-1,r,nil, tcell.StyleDefault)
+	}
 	for i, r := range coords {
 		screen.SetContent(startcoords+i, screenH-1, r, nil, tcell.StyleDefault)
 	}

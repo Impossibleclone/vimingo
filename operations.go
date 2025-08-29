@@ -5,9 +5,22 @@ import "strings"
 func TypeCh(line string, pos int, ch rune) string {
 	return line[:pos] + string(ch) + line[pos:]
 }
+
 func insertText(line string, pos int, text string) string {
 	return line[:pos] + text + line[pos:]
 }
+
+func YankRange(buffer *Buffer, cursor *Cursor, end int) {
+	start := cursor.X
+	buffer.Register = ""
+	toYankFromLine := buffer.Lines[cursor.Y]
+	if end >= len(toYankFromLine) {
+		end = len(toYankFromLine) - 1
+	}
+	toYankTheCharacters := []rune(toYankFromLine[start : end+1])
+	buffer.Register = string(toYankTheCharacters)
+}
+
 func Paste(buffer *Buffer, yankedText string) {
 	lines := strings.Split(yankedText, "\n")
 	if len(lines) == 1 {
@@ -18,11 +31,11 @@ func Paste(buffer *Buffer, yankedText string) {
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[0])
 				buffer.Cursor.X += len(lines[i])
 				NewLine(buffer)
-			} else if i > 0 && i < len(lines)-1 { //for the middle lines 
+			} else if i > 0 && i < len(lines)-1 { //for the middle lines
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[i])
 				buffer.Cursor.X = len(lines[i])
 				NewLine(buffer)
-			} else if i > 0 && i < len(lines) { //for the last line 
+			} else if i > 0 && i < len(lines) { //for the last line
 				buffer.Lines[buffer.Cursor.Y] = insertText(buffer.Lines[buffer.Cursor.Y], buffer.Cursor.X, lines[i])
 				buffer.Cursor.X = len(lines[i])
 			}
@@ -37,6 +50,10 @@ func Paste(buffer *Buffer, yankedText string) {
 
 func RemoveCh(line string, pos int) string {
 	return line[:pos] + line[pos+1:]
+}
+
+func RemoveChs(line string, startpos int, endpos int) string {
+	return line[:startpos] + line[endpos:]
 }
 
 // func yank(line string, start *Cursor) string {
@@ -69,11 +86,11 @@ func RemoveLine(buffer *Buffer) {
 }
 
 func adjustScroll(buffer *Buffer, screenH int) {
-    textHeight := screenH - 1 // reserve bottom line
+	textHeight := screenH - 1 // reserve bottom line
 
-    if buffer.Cursor.Y < buffer.ScrollY {
-        buffer.ScrollY = buffer.Cursor.Y
-    } else if buffer.Cursor.Y >= buffer.ScrollY+textHeight {
-        buffer.ScrollY = buffer.Cursor.Y - textHeight + 1
-    }
+	if buffer.Cursor.Y < buffer.ScrollY {
+		buffer.ScrollY = buffer.Cursor.Y
+	} else if buffer.Cursor.Y >= buffer.ScrollY+textHeight {
+		buffer.ScrollY = buffer.Cursor.Y - textHeight + 1
+	}
 }

@@ -19,6 +19,8 @@ Motion keys:
     l - Right
     w - Next word
     e - End of Word
+    _ - Start of Line
+    $ - End of Line
 
 A functional Status Line with Current Mode, File Name, Cursor Coordinates
 

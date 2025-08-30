@@ -1,5 +1,7 @@
 package main
 
+const TabStop = 4 // Define tab width for cursor movement consistency
+
 func isAlphabetorNumber(r rune) bool {
 	return (r >= 'A' && r <= 'Z') || (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9')
 }
@@ -26,7 +28,6 @@ func wMotion(buffer *Buffer, cursor *Cursor) int {
 	}
 }
 
-const TabStop = 4 // Define tab width for cursor movement consistency
 
 func eMotion(buffer *Buffer, cursor *Cursor) int {
 	line := buffer.Lines[cursor.Y]

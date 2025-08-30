@@ -37,7 +37,7 @@ Build the project:
 
 Run the editor:
 
-    ./vmg 
+    ./vmg
     ./vmg <filename>
 
 Usage

@@ -17,7 +17,7 @@ func YankRange(buffer *Buffer, cursor *Cursor, end int) {
 	if end >= len(toYankFromLine) {
 		end = len(toYankFromLine) - 1
 	}
-	toYankTheCharacters := []rune(toYankFromLine[start : end+1])
+	toYankTheCharacters := []rune(toYankFromLine[start : end])
 	buffer.Register = string(toYankTheCharacters)
 }
 

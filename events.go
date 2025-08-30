@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gdamore/tcell/v2"
@@ -113,7 +114,7 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
 					// start := cursor.X
 					YankRange(buffer, cursor, wMotion(buffer, cursor))
-					buffer.StatusMsg = "yanked"
+					buffer.StatusMsg = fmt.Sprintf("yanked till %d",wMotion(buffer, cursor))
 					buffer.KeyReg = nil
 				}else {
 					movedcur := wMotion(buffer, cursor)
@@ -129,8 +130,8 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 					buffer.StatusMsg = "deleted"
 				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
 					// start := cursor.X
-					YankRange(buffer, cursor, eMotion(buffer, cursor))
-					buffer.StatusMsg = "yanked"
+					YankRange(buffer, cursor, eMotion(buffer, cursor)+1)
+					buffer.StatusMsg = fmt.Sprintf("yanked till %d",eMotion(buffer, cursor))
 					buffer.KeyReg = nil
 				}else {
 					movedcur := eMotion(buffer, cursor)

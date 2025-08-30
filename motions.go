@@ -95,3 +95,22 @@ func eMotion(buffer *Buffer, cursor *Cursor) int {
 	return pos
 
 }
+func EMotion(buffer *Buffer, cursor *Cursor) int {
+	line := buffer.Lines[cursor.Y]
+	pos := cursor.X
+	if pos < len(line)-1 && line[pos+1] == ' ' {
+		pos++
+	}
+	if pos < len(line)-1 && line[pos+1] == '\t'{
+		pos+= TabStop
+	}
+	for x := pos; x < len(line)-1; x++ {
+		if x < len(line) && (line[x] == ' ' || line[x] == '\t'){
+			continue
+		}
+		if x < len(line) && (line[x+1] == ' ' || line[x+1] == '\t'){
+			return x
+		}
+	}
+	return len(line)-1
+}

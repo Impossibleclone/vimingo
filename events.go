@@ -140,6 +140,23 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 						cursor.X--
 					}
 				}
+			case 'E':
+				// r := ev.Rune()
+				// buffer.KeyReg = append(buffer.KeyReg, r)
+				if len(buffer.KeyReg) >0 &&  buffer.KeyReg[0] == 'd' {
+					buffer.StatusMsg = "deleted"
+				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
+					// start := cursor.X
+					YankRange(buffer, cursor, EMotion(buffer, cursor)+1)
+					buffer.StatusMsg = fmt.Sprintf("yanked till %d",EMotion(buffer, cursor))
+					buffer.KeyReg = nil
+				}else {
+					movedcur := EMotion(buffer, cursor)
+					cursor.X = movedcur
+					if cursor.X == len(buffer.Lines[cursor.Y]){
+						cursor.X--
+					}
+				}
 			}
 
 		//insertMode

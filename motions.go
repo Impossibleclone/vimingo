@@ -50,6 +50,7 @@ func eMotion(buffer *Buffer, cursor *Cursor) int {
 		if pos != cursor.X {
 			return pos
 		}
+		//if after spaces and tabs there is a symbol go to it.
 		if !isAlphabetorNumber(rune(line[pos+1])){
 			return pos+1
 		}

@@ -96,6 +96,7 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				if buffer.KeyReg == nil {
 					buffer.KeyReg = append(buffer.KeyReg, r)
 				} else {
+					buffer.Lines[cursor.Y] = RemoveChs(buffer.Lines[cursor.Y],0,len(buffer.Lines[cursor.Y]))
 					buffer.StatusMsg = "line deleted"
 					buffer.KeyReg = nil
 				}

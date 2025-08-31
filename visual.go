@@ -66,54 +66,6 @@ func CutSelection(buffer *Buffer, cursor *Cursor, visualStart *Cursor) {
 	buffer.Register = ""
 
 	if startline == endline {
-		// same line
-		toCutFromLine := buffer.Lines[startline]
-		toCutTheCharacters := []rune(toCutFromLine[start : end+1])
-		buffer.Register = string(toCutTheCharacters)
-
-		// remove cut characters from line
-		newLine := []rune(toCutFromLine[:start])
-		newLine = append(newLine, []rune(toCutFromLine[end+1:])...)
-		buffer.Lines[startline] = string(newLine)
-
-	} else {
-		// multiple lines
-		for y := startline; y <= endline; y++ {
-			if y == startline {
-				toCutFromLine := buffer.Lines[y]
-				toCutTheCharacters := []rune(toCutFromLine[start:])
-				buffer.Register += string(toCutTheCharacters)
-				buffer.Register += "\n"
-				buffer.Lines[y] = string([]rune(toCutFromLine[:start]))
-
-			} else if y == endline {
-				toCutFromLine := buffer.Lines[y]
-				toCutTheCharacters := []rune(toCutFromLine[:end+1])
-				buffer.Register += string(toCutTheCharacters)
-				// keep only part after end
-				buffer.Lines[y] = string([]rune(toCutFromLine[end+1:]))
-
-			} else {
-				toCutFromLine := buffer.Lines[y]
-				buffer.Register += toCutFromLine + "\n"
-				// delete whole line
-				buffer.Lines[y] = ""
-			}
-		}
-	}
-
-	DeleteSelection(buffer, cursor, visualStart)
-}
-
-func DeleteSelection(buffer *Buffer, cursor *Cursor, visualStart *Cursor) {
-	start := min(visualStart.X, cursor.X)
-	end := max(visualStart.X, cursor.X)
-	startline := min(visualStart.Y, cursor.Y)
-	endline := max(visualStart.Y, cursor.Y)
-
-	buffer.Register = ""
-
-	if startline == endline {
 		// single line delete
 		line := []rune(buffer.Lines[startline])
 		toDelete := line[start : end+1]

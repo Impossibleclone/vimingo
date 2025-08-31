@@ -67,6 +67,8 @@ In Visual mode the motions can be used to highlight the text.
 
     x to cut
 
+    c to change
+
     p to paste
 
 Press : to enter Command mode:

@@ -221,6 +221,10 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				CutSelection(buffer,cursor,visualStart)
 				mode.SwitchTo(Normal)
 
+			case ev.Rune() == 'c':
+				CutSelection(buffer,cursor,visualStart)
+				mode.SwitchTo(Insert)
+
 			case ev.Key() == ':':
 				mode.SwitchTo(Command)
 

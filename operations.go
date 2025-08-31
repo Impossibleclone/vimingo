@@ -85,6 +85,7 @@ func RemoveLine(buffer *Buffer) {
 	}
 }
 
+
 func adjustScroll(buffer *Buffer, screenH int) {
 	textHeight := screenH - 1 // reserve bottom line
 

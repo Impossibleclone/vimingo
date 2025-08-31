@@ -217,6 +217,10 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				YankSelection(buffer, cursor, visualStart)
 				mode.SwitchTo(Normal)
 
+			case ev.Rune() == 'x':
+				CutSelection(buffer,cursor,visualStart)
+				mode.SwitchTo(Normal)
+
 			case ev.Key() == ':':
 				mode.SwitchTo(Command)
 

@@ -1,7 +1,11 @@
 APP = vmg
 SRC = $(wildcard *.go)
+PREFIX=/usr/bin/
 
 all: build
+
+install: build
+	mv $(APP) $(PREFIX)
 
 build:
 	go build -o $(APP) $(SRC)

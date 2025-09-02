@@ -31,9 +31,9 @@ Clone the repo:
     git clone https://github.com/impossibleclone/vimingo.git
     cd vimingo
 
-Build the project:
+Install the project:
 
-    make build
+    sudo make install 
 
 Run the editor:
 

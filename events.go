@@ -75,7 +75,7 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 			case 'h':
 				cursor.MoveLeft()
 			case '_':
-				cursor.X = 0 
+				cursor.X = 0
 
 			case 'j':
 				cursor.MoveDown(buffer)
@@ -89,14 +89,14 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				cursor.MoveRightinNormal(buffer)
 
 			case '$':
-				cursor.X = len(buffer.Lines[cursor.Y])-1
+				cursor.X = len(buffer.Lines[cursor.Y]) - 1
 
 			case 'd':
 				r := ev.Rune()
 				if buffer.KeyReg == nil {
 					buffer.KeyReg = append(buffer.KeyReg, r)
 				} else {
-					buffer.Lines[cursor.Y] = RemoveChs(buffer.Lines[cursor.Y],0,len(buffer.Lines[cursor.Y]))
+					buffer.Lines[cursor.Y] = RemoveChs(buffer.Lines[cursor.Y], 0, len(buffer.Lines[cursor.Y]))
 					buffer.StatusMsg = "line deleted"
 					buffer.KeyReg = nil
 				}
@@ -107,54 +107,59 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				} else {
 					buffer.KeyReg = nil
 				}
+			case 'x':
+				buffer.Register = string(buffer.Lines[cursor.Y][cursor.X])
+				buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
+				cursor.MoveLeft()
+
 			case 'w':
 				// r := ev.Rune()
 				// buffer.KeyReg = append(buffer.KeyReg, r)
-				if len(buffer.KeyReg) >0 &&  buffer.KeyReg[0] == 'd' {
+				if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'd' {
 					buffer.StatusMsg = "word deleted"
-				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
+				} else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
 					// start := cursor.X
 					YankRange(buffer, cursor, wMotion(buffer, cursor))
-					buffer.StatusMsg = fmt.Sprintf("yanked till %d",wMotion(buffer, cursor))
+					buffer.StatusMsg = fmt.Sprintf("yanked till %d", wMotion(buffer, cursor))
 					buffer.KeyReg = nil
-				}else {
+				} else {
 					movedcur := wMotion(buffer, cursor)
 					cursor.X = movedcur
-					if cursor.X == len(buffer.Lines[cursor.Y]){
+					if cursor.X == len(buffer.Lines[cursor.Y]) {
 						cursor.X--
 					}
 				}
 			case 'e':
 				// r := ev.Rune()
 				// buffer.KeyReg = append(buffer.KeyReg, r)
-				if len(buffer.KeyReg) >0 &&  buffer.KeyReg[0] == 'd' {
+				if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'd' {
 					buffer.StatusMsg = "deleted"
-				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
+				} else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
 					// start := cursor.X
 					YankRange(buffer, cursor, eMotion(buffer, cursor)+1)
-					buffer.StatusMsg = fmt.Sprintf("yanked till %d",eMotion(buffer, cursor))
+					buffer.StatusMsg = fmt.Sprintf("yanked till %d", eMotion(buffer, cursor))
 					buffer.KeyReg = nil
-				}else {
+				} else {
 					movedcur := eMotion(buffer, cursor)
 					cursor.X = movedcur
-					if cursor.X == len(buffer.Lines[cursor.Y]){
+					if cursor.X == len(buffer.Lines[cursor.Y]) {
 						cursor.X--
 					}
 				}
 			case 'E':
 				// r := ev.Rune()
 				// buffer.KeyReg = append(buffer.KeyReg, r)
-				if len(buffer.KeyReg) >0 &&  buffer.KeyReg[0] == 'd' {
+				if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'd' {
 					buffer.StatusMsg = "deleted"
-				}else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
+				} else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
 					// start := cursor.X
 					YankRange(buffer, cursor, EMotion(buffer, cursor)+1)
-					buffer.StatusMsg = fmt.Sprintf("yanked till %d",EMotion(buffer, cursor))
+					buffer.StatusMsg = fmt.Sprintf("yanked till %d", EMotion(buffer, cursor))
 					buffer.KeyReg = nil
-				}else {
+				} else {
 					movedcur := EMotion(buffer, cursor)
 					cursor.X = movedcur
-					if cursor.X == len(buffer.Lines[cursor.Y]){
+					if cursor.X == len(buffer.Lines[cursor.Y]) {
 						cursor.X--
 					}
 				}
@@ -218,11 +223,11 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				mode.SwitchTo(Normal)
 
 			case ev.Rune() == 'x':
-				CutSelection(buffer,cursor,visualStart)
+				CutSelection(buffer, cursor, visualStart)
 				mode.SwitchTo(Normal)
 
 			case ev.Rune() == 'c':
-				CutSelection(buffer,cursor,visualStart)
+				CutSelection(buffer, cursor, visualStart)
 				mode.SwitchTo(Insert)
 
 			case ev.Key() == ':':

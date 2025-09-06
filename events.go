@@ -74,7 +74,7 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 
 			case 'h':
 				cursor.MoveLeft()
-			case '_':
+			case '^':
 				cursor.X = 0
 
 			case 'j':

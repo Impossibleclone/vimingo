@@ -28,6 +28,10 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				cursor.HalfUp(buffer, screen)
 				adjustScroll(buffer, screenH)
 
+			case tcell.KeyDelete:
+				buffer.Register = string(buffer.Lines[cursor.Y][cursor.X])
+				buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
+				cursor.MoveLeft()
 			}
 			switch ev.Rune() {
 			//To switch to InsertMode
@@ -111,6 +115,7 @@ func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cu
 				buffer.Register = string(buffer.Lines[cursor.Y][cursor.X])
 				buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
 				cursor.MoveLeft()
+
 
 			case 'w':
 				// r := ev.Rune()

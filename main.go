@@ -1,17 +1,28 @@
 package main
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"log"
 	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-func main() {
-	// if len(os.Args) < 2 {
-	// 	log.Fatal("Please read the instructions properly.")
-	// }
+// model holds the entire state of the text editor.
+type model struct {
+	buffer      *Buffer
+	cursor      *Cursor
+	visualStart Cursor
+	mode        *EditorMode
+	width       int
+	height      int
+	quit        bool
+}
+
+// initialModel sets up the editor's starting state.
+func initialModel() model {
 	var buffer *Buffer
 	var filename string
+
 	if len(os.Args) == 1 {
 		filename = "[No Name]"
 		buffer = &Buffer{
@@ -43,37 +54,26 @@ func main() {
 			ScrollY:  0,
 			Register: "",
 		}
-
 	}
+
 	visualStart := Cursor{X: 0, Y: 0} // default value
-
-	screen, err := tcell.NewScreen()
-	if err != nil {
-		log.Fatalf("Error creating screen: %v", err)
-	}
-
-	// Initialize the screen
-	if err := screen.Init(); err != nil {
-		log.Fatalf("Error initializing screen: %v", err)
-	}
-
-	defer screen.Fini()
-	screen.Clear()
-	screen.Show()
-
-	// cur := &Cursor{X: 0, Y: 0}
 	cursor := buffer.Cursor
-
-	quit := func() {
-		screen.Fini()
-		os.Exit(0)
-	}
 	mode := NewEditorMode()
-	for {
 
-		ev := screen.PollEvent()
-		HandleEvent(ev, buffer, cursor, &visualStart, mode, screen, quit)
+	return model{
+		buffer:      buffer,
+		cursor:      cursor,
+		visualStart: visualStart,
+		mode:        mode,
+	}
+}
 
-		RenderScreen(screen, buffer, visualStart, mode)
+func main() {
+	m := initialModel()
+	// WithAltScreen to have full screen
+	p := tea.NewProgram(&m, tea.WithAltScreen(), tea.WithMouseAllMotion())
+
+	if _, err := p.Run(); err != nil {
+		log.Fatalf("Error running program: %v", err)
 	}
 }

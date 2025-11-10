@@ -4,325 +4,325 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gdamore/tcell/v2"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-func HandleEvent(ev tcell.Event, buffer *Buffer, cursor *Cursor, visualStart *Cursor, mode *EditorMode, screen tcell.Screen, quit func()) {
-	switch ev := ev.(type) {
-	case *tcell.EventResize:
-		screen.Sync()
-		// MaxW, MaxH = screen.Size()
+func (m *model) Init() tea.Cmd {
+	return nil
+}
 
-	case *tcell.EventKey:
-		_, screenH := screen.Size()
-		switch mode.Current() {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
+		return m, nil
+
+	// Handle key press events
+	case tea.KeyMsg:
+		quit := func() {
+			m.quit = true
+		}
+
+		screenH := m.height
+
+		switch m.mode.Current() {
 
 		//NormalMode
 		case Normal:
-			switch ev.Key() {
-			case tcell.KeyCtrlD:
-				cursor.HalfDown(buffer, screen)
-				adjustScroll(buffer, screenH)
+			switch msg.Type {
+			case tea.KeyCtrlD:
+				m.cursor.HalfDown(m.buffer, m.height)
+				adjustScroll(m.buffer, screenH)
 
-			case tcell.KeyCtrlU:
-				cursor.HalfUp(buffer, screen)
-				adjustScroll(buffer, screenH)
+			case tea.KeyCtrlU:
+				m.cursor.HalfUp(m.buffer, m.height)
+				adjustScroll(m.buffer, screenH)
 
-			case tcell.KeyDelete:
-				buffer.Register = string(buffer.Lines[cursor.Y][cursor.X])
-				buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
-				cursor.MoveLeft()
-			}
-			switch ev.Rune() {
-			//To switch to InsertMode
-			case 'v':
-				*visualStart = *cursor
-				mode.SwitchTo(Visual)
+			case tea.KeyDelete:
+				m.buffer.Register = string(m.buffer.Lines[m.cursor.Y][m.cursor.X])
+				m.buffer.Lines[m.cursor.Y] = RemoveCh(m.buffer.Lines[m.cursor.Y], m.cursor.X) //delete a character and update the line
+				m.cursor.MoveLeft()
 
-			case 'p':
-				Paste(buffer, buffer.Register)
+			case tea.KeyRunes:
+				// Handle rune-based keys
+				switch r := msg.Runes[0]; r {
+				case 'v':
+					m.visualStart = *m.cursor
+					m.mode.SwitchTo(Visual)
 
-			case 'i':
-				mode.SwitchTo(Insert)
+				case 'p':
+					Paste(m.buffer, m.buffer.Register)
 
-			case 'I':
-				cursor.X = 0
-				mode.SwitchTo(Insert)
+				case 'i':
+					m.mode.SwitchTo(Insert)
 
-			//to edit after the cursor.
-			case 'a':
-				mode.SwitchTo(Insert)
-				cursor.MoveRightinInsert(buffer)
+				case 'I':
+					m.cursor.X = 0
+					m.mode.SwitchTo(Insert)
 
-			case 'A':
-				cursor.X = len(buffer.Lines[cursor.Y])
-				mode.SwitchTo(Insert)
+				case 'a':
+					m.mode.SwitchTo(Insert)
+					m.cursor.MoveRightinInsert(m.buffer)
 
-			//to edit on a new line.
-			case 'O':
-				cursor.X = 0
-				NewLine(buffer)
-				cursor.Y--
-				mode.SwitchTo(Insert)
+				case 'A':
+					m.cursor.X = len(m.buffer.Lines[m.cursor.Y])
+					m.mode.SwitchTo(Insert)
 
-			case 'o':
-				mode.SwitchTo(Insert)
-				cursor.X = len(buffer.Lines[cursor.Y])
-				// cursor.MoveDown(buffer)
-				NewLine(buffer)
-				// cursor.MoveUp(buffer)
+				case 'O':
+					m.cursor.X = 0
+					NewLine(m.buffer)
+					m.cursor.Y--
+					m.mode.SwitchTo(Insert)
 
-			case ':':
-				mode.SwitchTo(Command)
-				buffer.Command = nil
+				case 'o':
+					m.mode.SwitchTo(Insert)
+					m.cursor.X = len(m.buffer.Lines[m.cursor.Y])
+					NewLine(m.buffer)
 
-			case 'h':
-				cursor.MoveLeft()
-			case '^':
-				cursor.X = 0
+				case ':':
+					m.mode.SwitchTo(Command)
+					m.buffer.Command = nil
 
-			case 'j':
-				cursor.MoveDown(buffer)
-				adjustScroll(buffer, screenH)
+				case 'h':
+					m.cursor.MoveLeft()
+				case '^':
+					m.cursor.X = 0
 
-			case 'k':
-				cursor.MoveUp(buffer)
-				adjustScroll(buffer, screenH)
+				case 'j':
+					m.cursor.MoveDown(m.buffer)
+					adjustScroll(m.buffer, screenH)
 
-			case 'l':
-				cursor.MoveRightinNormal(buffer)
+				case 'k':
+					m.cursor.MoveUp(m.buffer)
+					adjustScroll(m.buffer, screenH)
 
-			case '$':
-				cursor.X = len(buffer.Lines[cursor.Y]) - 1
+				case 'l':
+					m.cursor.MoveRightinNormal(m.buffer)
 
-			case 'd':
-				r := ev.Rune()
-				if buffer.KeyReg == nil {
-					buffer.KeyReg = append(buffer.KeyReg, r)
-				} else {
-					buffer.Lines[cursor.Y] = RemoveChs(buffer.Lines[cursor.Y], 0, len(buffer.Lines[cursor.Y]))
-					buffer.StatusMsg = "line deleted"
-					buffer.KeyReg = nil
-				}
-			case 'y':
-				r := ev.Rune()
-				if buffer.KeyReg == nil {
-					buffer.KeyReg = append(buffer.KeyReg, r)
-				} else {
-					buffer.KeyReg = nil
-				}
-			case 'x':
-				buffer.Register = string(buffer.Lines[cursor.Y][cursor.X])
-				buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
-				cursor.MoveLeft()
+				case '$':
+					m.cursor.X = len(m.buffer.Lines[m.cursor.Y]) - 1
 
-
-			case 'w':
-				// r := ev.Rune()
-				// buffer.KeyReg = append(buffer.KeyReg, r)
-				if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'd' {
-					buffer.StatusMsg = "word deleted"
-				} else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
-					// start := cursor.X
-					YankRange(buffer, cursor, wMotion(buffer, cursor))
-					buffer.StatusMsg = fmt.Sprintf("yanked till %d", wMotion(buffer, cursor))
-					buffer.KeyReg = nil
-				} else {
-					movedcur := wMotion(buffer, cursor)
-					cursor.X = movedcur
-					if cursor.X == len(buffer.Lines[cursor.Y]) {
-						cursor.X--
+				case 'd':
+					r := msg.Runes[0]
+					if m.buffer.KeyReg == nil {
+						m.buffer.KeyReg = append(m.buffer.KeyReg, r)
+					} else {
+						m.buffer.Lines[m.cursor.Y] = RemoveChs(m.buffer.Lines[m.cursor.Y], 0, len(m.buffer.Lines[m.cursor.Y]))
+						m.buffer.StatusMsg = "line deleted"
+						m.buffer.KeyReg = nil
 					}
-				}
-			case 'e':
-				// r := ev.Rune()
-				// buffer.KeyReg = append(buffer.KeyReg, r)
-				if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'd' {
-					buffer.StatusMsg = "deleted"
-				} else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
-					// start := cursor.X
-					YankRange(buffer, cursor, eMotion(buffer, cursor)+1)
-					buffer.StatusMsg = fmt.Sprintf("yanked till %d", eMotion(buffer, cursor))
-					buffer.KeyReg = nil
-				} else {
-					movedcur := eMotion(buffer, cursor)
-					cursor.X = movedcur
-					if cursor.X == len(buffer.Lines[cursor.Y]) {
-						cursor.X--
+				case 'y':
+					r := msg.Runes[0]
+					if m.buffer.KeyReg == nil {
+						m.buffer.KeyReg = append(m.buffer.KeyReg, r)
+					} else {
+						m.buffer.KeyReg = nil
 					}
-				}
-			case 'E':
-				// r := ev.Rune()
-				// buffer.KeyReg = append(buffer.KeyReg, r)
-				if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'd' {
-					buffer.StatusMsg = "deleted"
-				} else if len(buffer.KeyReg) > 0 && buffer.KeyReg[0] == 'y' {
-					// start := cursor.X
-					YankRange(buffer, cursor, EMotion(buffer, cursor)+1)
-					buffer.StatusMsg = fmt.Sprintf("yanked till %d", EMotion(buffer, cursor))
-					buffer.KeyReg = nil
-				} else {
-					movedcur := EMotion(buffer, cursor)
-					cursor.X = movedcur
-					if cursor.X == len(buffer.Lines[cursor.Y]) {
-						cursor.X--
+				case 'x':
+					m.buffer.Register = string(m.buffer.Lines[m.cursor.Y][m.cursor.X])
+					m.buffer.Lines[m.cursor.Y] = RemoveCh(m.buffer.Lines[m.cursor.Y], m.cursor.X) //delete a character and update the line
+					m.cursor.MoveLeft()
+
+				case 'w':
+					if len(m.buffer.KeyReg) > 0 && m.buffer.KeyReg[0] == 'd' {
+						m.buffer.StatusMsg = "word deleted"
+					} else if len(m.buffer.KeyReg) > 0 && m.buffer.KeyReg[0] == 'y' {
+						YankRange(m.buffer, m.cursor, wMotion(m.buffer, m.cursor))
+						m.buffer.StatusMsg = fmt.Sprintf("yanked till %d", wMotion(m.buffer, m.cursor))
+						m.buffer.KeyReg = nil
+					} else {
+						movedcur := wMotion(m.buffer, m.cursor)
+						m.cursor.X = movedcur
+						if m.cursor.X == len(m.buffer.Lines[m.cursor.Y]) {
+							m.cursor.X--
+						}
+					}
+				case 'e':
+					if len(m.buffer.KeyReg) > 0 && m.buffer.KeyReg[0] == 'd' {
+						m.buffer.StatusMsg = "deleted"
+					} else if len(m.buffer.KeyReg) > 0 && m.buffer.KeyReg[0] == 'y' {
+						YankRange(m.buffer, m.cursor, eMotion(m.buffer, m.cursor)+1)
+						m.buffer.StatusMsg = fmt.Sprintf("yanked till %d", eMotion(m.buffer, m.cursor))
+						m.buffer.KeyReg = nil
+					} else {
+						movedcur := eMotion(m.buffer, m.cursor)
+						m.cursor.X = movedcur
+						if m.cursor.X == len(m.buffer.Lines[m.cursor.Y]) {
+							m.cursor.X--
+						}
+					}
+				case 'E':
+					if len(m.buffer.KeyReg) > 0 && m.buffer.KeyReg[0] == 'd' {
+						m.buffer.StatusMsg = "deleted"
+					} else if len(m.buffer.KeyReg) > 0 && m.buffer.KeyReg[0] == 'y' {
+						YankRange(m.buffer, m.cursor, EMotion(m.buffer, m.cursor)+1)
+						m.buffer.StatusMsg = fmt.Sprintf("yanked till %d", EMotion(m.buffer, m.cursor))
+						m.buffer.KeyReg = nil
+					} else {
+						movedcur := EMotion(m.buffer, m.cursor)
+						m.cursor.X = movedcur
+						if m.cursor.X == len(m.buffer.Lines[m.cursor.Y]) {
+							m.cursor.X--
+						}
 					}
 				}
 			}
 
 		//insertMode
 		case Insert:
-			switch {
-			case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
-				if cursor.X == 0 {
-					RemoveLine(buffer)
+			switch msg.Type {
+			case tea.KeyBackspace:
+				if m.cursor.X == 0 {
+					RemoveLine(m.buffer)
 				}
-				if cursor.X > 0 {
-					cursor.MoveLeft()
-					buffer.Lines[cursor.Y] = RemoveCh(buffer.Lines[cursor.Y], cursor.X) //delete a character and update the line
+				if m.cursor.X > 0 {
+					m.cursor.MoveLeft()
+					m.buffer.Lines[m.cursor.Y] = RemoveCh(m.buffer.Lines[m.cursor.Y], m.cursor.X) //delete a character and update the line
 				}
 
-			case ev.Key() == tcell.KeyEnter, ev.Key() == tcell.KeyCR:
-				NewLine(buffer)
+			case tea.KeyEnter:
+				NewLine(m.buffer)
 
-			case ev.Key() == tcell.KeyEscape, ev.Key() == tcell.KeyCtrlC:
-				if cursor.X > len(buffer.Lines[cursor.Y])-1 {
-					cursor.MoveLeft()
+			case tea.KeyEscape, tea.KeyCtrlC:
+				if m.cursor.X > len(m.buffer.Lines[m.cursor.Y])-1 {
+					m.cursor.MoveLeft()
 				}
-				mode.SwitchTo(Normal)
+				m.mode.SwitchTo(Normal)
 
-			//Logic for Typing:
-			case ev.Rune() != 0:
-				r := ev.Rune()                                                       //save the typed character
-				buffer.Lines[cursor.Y] = TypeCh(buffer.Lines[cursor.Y], cursor.X, r) //update the line
-				cursor.MoveRightinInsert(buffer)                                     //increment the position of the cursor in X.
+			case tea.KeyLeft:
+				m.cursor.MoveLeft()
 
-			case ev.Key() == tcell.KeyLeft:
-				cursor.MoveLeft()
+			case tea.KeyDown:
+				m.cursor.MoveDown(m.buffer)
+				adjustScroll(m.buffer, screenH)
 
-			case ev.Key() == tcell.KeyDown:
-				cursor.MoveDown(buffer)
-				adjustScroll(buffer, screenH)
+			case tea.KeyUp:
+				m.cursor.MoveUp(m.buffer)
+				adjustScroll(m.buffer, screenH)
 
-			case ev.Key() == tcell.KeyUp:
-				cursor.MoveUp(buffer)
-				adjustScroll(buffer, screenH)
+			case tea.KeyRight:
+				m.cursor.MoveRightinInsert(m.buffer)
 
-			case ev.Key() == tcell.KeyRight:
-				cursor.MoveRightinInsert(buffer)
+			case tea.KeyRunes:
+				//Logic for Typing:
+				r := msg.Runes[0]                                                          //save the typed character
+				m.buffer.Lines[m.cursor.Y] = TypeCh(m.buffer.Lines[m.cursor.Y], m.cursor.X, r) //update the line
+				m.cursor.MoveRightinInsert(m.buffer)                                       //increment the position of the cursor in X.
 			}
 		case Visual:
-			switch {
-			case ev.Key() == tcell.KeyEscape, ev.Key() == tcell.KeyCtrlC:
-				mode.SwitchTo(Normal)
+			switch msg.Type {
+			case tea.KeyEscape, tea.KeyCtrlC:
+				m.mode.SwitchTo(Normal)
 
-			case ev.Rune() == 'v':
-				if mode.Current() == Normal {
-					mode.SwitchTo(Visual)
-					*visualStart = *cursor
-				} else {
-					mode.SwitchTo(Normal)
+			case tea.KeyRunes:
+				switch r := msg.Runes[0]; r {
+				case 'v':
+					if m.mode.Current() == Normal {
+						m.mode.SwitchTo(Visual)
+						m.visualStart = *m.cursor
+					} else {
+						m.mode.SwitchTo(Normal)
+					}
+				case 'y':
+					YankSelection(m.buffer, m.cursor, &m.visualStart)
+					m.mode.SwitchTo(Normal)
+
+				case 'x':
+					CutSelection(m.buffer, m.cursor, &m.visualStart)
+					m.mode.SwitchTo(Normal)
+
+				case 'c':
+					CutSelection(m.buffer, m.cursor, &m.visualStart)
+					m.mode.SwitchTo(Insert)
+
+				case ':':
+					m.mode.SwitchTo(Command)
+					m.buffer.Command = nil
+				case 'p':
+					Paste(m.buffer, m.buffer.Register)
+
+				case 'h':
+					m.cursor.MoveLeft()
+
+				case 'j':
+					m.cursor.MoveDown(m.buffer)
+					adjustScroll(m.buffer, screenH)
+
+				case 'k':
+					m.cursor.MoveUp(m.buffer)
+					adjustScroll(m.buffer, screenH)
+
+				case 'l':
+					m.cursor.MoveRightinNormal(m.buffer)
 				}
-			case ev.Rune() == 'y':
-				YankSelection(buffer, cursor, visualStart)
-				mode.SwitchTo(Normal)
-
-			case ev.Rune() == 'x':
-				CutSelection(buffer, cursor, visualStart)
-				mode.SwitchTo(Normal)
-
-			case ev.Rune() == 'c':
-				CutSelection(buffer, cursor, visualStart)
-				mode.SwitchTo(Insert)
-
-			case ev.Key() == ':':
-				mode.SwitchTo(Command)
-
-				buffer.Command = nil
-			case ev.Rune() == 'p':
-				Paste(buffer, buffer.Register)
-
-			case ev.Rune() == 'h':
-				cursor.MoveLeft()
-
-			case ev.Rune() == 'j':
-				cursor.MoveDown(buffer)
-				adjustScroll(buffer, screenH)
-
-			case ev.Rune() == 'k':
-				cursor.MoveUp(buffer)
-				adjustScroll(buffer, screenH)
-
-			case ev.Rune() == 'l':
-				cursor.MoveRightinNormal(buffer)
-				// line := buffer.Lines[cursor.Y]
-				// screen.SetContent(cursor.X, cursor.Y-buffer.ScrollY, rune(line[cursor.X]), nil, tcell.StyleDefault.Reverse(true))
 			}
 
 		//CommandMode
-
 		case Command:
-			switch {
-			case ev.Key() == tcell.KeyBackspace, ev.Key() == tcell.KeyBackspace2:
-				if len(buffer.Command) > 0 {
-					buffer.Command = buffer.Command[:len(buffer.Command)-1]
+			switch msg.Type {
+			case tea.KeyBackspace:
+				if len(m.buffer.Command) > 0 {
+					m.buffer.Command = m.buffer.Command[:len(m.buffer.Command)-1]
 				}
 
-			case ev.Key() == tcell.KeyEnter, ev.Key() == tcell.KeyCR:
+			case tea.KeyEnter:
+				cmds := strings.Fields(string(m.buffer.Command))
 
-				cmds := strings.Fields(string(buffer.Command))
-
-				//check if nothing is typed
 				if len(cmds) == 0 {
-					mode.SwitchTo(Normal)
-					buffer.Command = nil
-					return
+					m.mode.SwitchTo(Normal)
+					m.buffer.Command = nil
+					return m, nil
 				}
 
 				switch cmds[0] {
 				case "w":
 					if len(cmds) > 1 {
-						if err := SaveFile(cmds[1], buffer); err != nil {
-							buffer.StatusMsg = err.Error()
+						if err := SaveFile(cmds[1], m.buffer); err != nil {
+							m.buffer.StatusMsg = err.Error()
 						} else {
-							buffer.Filename = cmds[1]
-							buffer.StatusMsg = "Written " + buffer.Filename
+							m.buffer.Filename = cmds[1]
+							m.buffer.StatusMsg = "Written " + m.buffer.Filename
 						}
 					} else {
-						if err := SaveFile(buffer.Filename, buffer); err != nil {
-							buffer.StatusMsg = err.Error()
+						if err := SaveFile(m.buffer.Filename, m.buffer); err != nil {
+							m.buffer.StatusMsg = err.Error()
 						} else {
-							buffer.StatusMsg = "Written " + buffer.Filename
+							m.buffer.StatusMsg = "Written " + m.buffer.Filename
 						}
 					}
-
-					mode.SwitchTo(Normal)
-					buffer.Command = nil
+					m.mode.SwitchTo(Normal)
+					m.buffer.Command = nil
 
 				case "q":
 					quit()
 
 				case "wq":
-					if err := SaveFile(buffer.Filename, buffer); err != nil {
-						buffer.StatusMsg = err.Error()
-						mode.SwitchTo(Normal)
-						buffer.Command = nil
+					if err := SaveFile(m.buffer.Filename, m.buffer); err != nil {
+						m.buffer.StatusMsg = err.Error()
+						m.mode.SwitchTo(Normal)
+						m.buffer.Command = nil
 					} else {
-						buffer.StatusMsg = "Written " + buffer.Filename
+						m.buffer.StatusMsg = "Written " + m.buffer.Filename
 						quit()
 					}
 				}
-				buffer.Command = nil
+				m.buffer.Command = nil
 
-			case ev.Key() == tcell.KeyEscape:
-				mode.SwitchTo(Normal)
+			case tea.KeyEscape:
+				m.mode.SwitchTo(Normal)
 
-			case ev.Rune() != 0:
-				r := ev.Rune() //preserve the typed character
-				buffer.Command = append(buffer.Command, r)
-
+			case tea.KeyRunes:
+				r := msg.Runes[0] //preserve the typed character
+				m.buffer.Command = append(m.buffer.Command, r)
 			}
 		}
-
 	}
+
+	if m.quit {
+		return m, tea.Quit
+	}
+
+	return m, nil
 }

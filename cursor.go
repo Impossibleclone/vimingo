@@ -1,16 +1,11 @@
 package main
 
-import (
-	"github.com/gdamore/tcell/v2"
-)
-
 type Cursor struct {
 	X    int
 	Y    int
 	remX int
 }
 
-// Define method on *Cursor receiver:
 func (c *Cursor) MoveLeft() {
 	if c.X > 0 {
 		c.X--
@@ -75,9 +70,9 @@ func (c *Cursor) MoveDown(buffer *Buffer) {
 	}
 }
 
-func (c *Cursor) HalfDown(buffer *Buffer, screen tcell.Screen) {
+func (c *Cursor) HalfDown(buffer *Buffer, screenH int) {
 	if c.Y < len(buffer.Lines)-1 {
-		_, screenH := screen.Size()
+		// _, screenH := screen.Size() // No longer need this line
 		half := screenH / 2
 		c.Y += half
 
@@ -96,8 +91,8 @@ func (c *Cursor) HalfDown(buffer *Buffer, screen tcell.Screen) {
 	}
 }
 
-func (c *Cursor) HalfUp(buffer *Buffer, screen tcell.Screen) {
-	_, screenH := screen.Size()
+func (c *Cursor) HalfUp(buffer *Buffer, screenH int) {
+	// _, screenH := screen.Size() // No longer need this line
 	half := screenH / 2
 	if c.Y > 0 {
 		if c.Y < half {
@@ -122,14 +117,14 @@ func (c *Cursor) HalfUp(buffer *Buffer, screen tcell.Screen) {
 }
 
 func visualColumn(line []rune, runeIndex int, tabSize int) int {
-    col := 0
-    for i := 0; i < runeIndex && i < len(line); i++ {
-        if line[i] == '\t' {
-            spaces := tabSize - (col % tabSize)
-            col += spaces
-        } else {
-            col++
-        }
-    }
-    return col
+	col := 0
+	for i := 0; i < runeIndex && i < len(line); i++ {
+		if line[i] == '\t' {
+			spaces := tabSize - (col % tabSize)
+			col += spaces
+		} else {
+			col++
+		}
+	}
+	return col
 }

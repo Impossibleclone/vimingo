@@ -1,6 +1,6 @@
 **vimingo**
 
-A simple terminal-based text editor written in Go using the tcell package.
+A simple terminal-based text editor written in Go using bubbletea.
 Features implemented till now:
 
 Insert and command modes (similar to Vim)
@@ -30,6 +30,7 @@ Clone the repo:
 
     git clone https://github.com/impossibleclone/vimingo.git
     cd vimingo
+    go mod tidy
 
 Install the project:
 
@@ -85,6 +86,6 @@ Dependencies
 
     Go 1.20+
 
-    tcell
+    bubbletea
 
 Contributions are welcome! Feel free to open issues or pull requests.

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
-
+	"strconv"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -173,6 +173,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		//insertMode
 		case Insert:
 			switch msg.Type {
+			case tea.KeySpace:
+				m.buffer.Lines[m.cursor.Y] = TypeCh(m.buffer.Lines[m.cursor.Y], m.cursor.X, ' ')
+				m.cursor.MoveRightinInsert(m.buffer)
+
 			case tea.KeyBackspace:
 				if m.cursor.X == 0 {
 					RemoveLine(m.buffer)
@@ -273,6 +277,21 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if len(cmds) == 0 {
 					m.mode.SwitchTo(Normal)
 					m.buffer.Command = nil
+					return m, nil
+				}
+
+				if num, err := strconv.Atoi(cmds[0]); err == nil {
+					if num > len(m.buffer.Lines) {
+						m.cursor.Y = len(m.buffer.Lines)-1
+						m.mode.SwitchTo(Normal)
+						m.buffer.Command = nil
+						adjustScroll(m.buffer, screenH)
+						return m, nil
+					}
+					m.cursor.Y = num - 1
+					m.mode.SwitchTo(Normal)
+					m.buffer.Command = nil
+					adjustScroll(m.buffer, screenH)
 					return m, nil
 				}
 

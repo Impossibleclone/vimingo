@@ -80,9 +80,9 @@ func (m *model) View() string {
 
 	status := ""
 	if m.mode.Current() == Normal {
-		status = "-- NORMAL --" + " \\ " + m.buffer.Filename
+		status = " -- NORMAL -- " + m.buffer.Filename
 	} else if m.mode.Current() == Insert {
-		status = "-- INSERT --" + " \\ " + m.buffer.Filename
+		status = " -- INSERT -- " + m.buffer.Filename
 	} else if m.mode.Current() == Command {
 		status = ":" + string(m.buffer.Command)
 	}
@@ -90,7 +90,7 @@ func (m *model) View() string {
 		status += " | " + m.buffer.StatusMsg
 	}
 
-	coords := fmt.Sprintf("/ %d:%d ", m.buffer.Cursor.Y+1, m.buffer.Cursor.X+1)
+	coords := fmt.Sprintf("%d:%d ", m.buffer.Cursor.Y+1, m.buffer.Cursor.X+1)
 	operators := string(m.buffer.KeyReg)
 
 	statusLine := make([]rune, screenW)

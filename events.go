@@ -177,6 +177,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.buffer.Lines[m.cursor.Y] = TypeCh(m.buffer.Lines[m.cursor.Y], m.cursor.X, ' ')
 				m.cursor.MoveRightinInsert(m.buffer)
 
+			case tea.KeyTab:
+				m.buffer.Lines[m.cursor.Y] = TypeCh(m.buffer.Lines[m.cursor.Y], m.cursor.X, '\t')
+				m.cursor.MoveRightinInsert(m.buffer)
 			case tea.KeyBackspace:
 				if m.cursor.X == 0 {
 					RemoveLine(m.buffer)

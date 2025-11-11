@@ -80,7 +80,9 @@ Press : to enter Command mode:
 
     :q to quit
 
-:wq to save and quit
+    :wq to save and quit
+
+	:line-number to navigate to that line. e.g. :10
 
 Dependencies
 

@@ -1,29 +1,31 @@
-package main
+package core
 
 // define mode
 type Mode int
 
 const (
-    Normal Mode = iota
-    Insert
+	Normal Mode = iota
+	Insert
 	Command
 	Visual
 )
 
 // currnt mode
 type EditorMode struct {
-    current Mode
+	current Mode
 }
 
 // to start with normal
 func NewEditorMode() *EditorMode {
-    return &EditorMode{current: Normal}
+	return &EditorMode{current: Normal}
 }
+
 // give current to show
 func (e *EditorMode) Current() Mode {
-    return e.current
+	return e.current
 }
+
 // change the mode
 func (e *EditorMode) SwitchTo(m Mode) {
-    e.current = m
+	e.current = m
 }

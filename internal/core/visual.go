@@ -1,6 +1,6 @@
-package main
+package core
 
-func isInSelection(start, end Cursor, x, y int) bool {
+func IsInSelection(start, end Cursor, x, y int) bool {
 	if start.Y > end.Y || (start.Y == end.Y && start.X > end.X) {
 		start, end = end, start
 	}

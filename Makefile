@@ -1,20 +1,26 @@
 APP = vmg
-SRC = $(wildcard *.go)
-PREFIX=/usr/bin/
+PREFIX = /usr/bin/
+
+# The main package to build
+MAIN_PKG = ./cmd/vmg
 
 all: build
 
 install: build
-	mv $(APP) $(PREFIX)
+	@echo "Installing $(APP) to $(PREFIX)..."
+	@mv $(APP) $(PREFIX)
+	@echo "Done! You may need sudo."
 
 build:
-	go build -o $(APP) $(SRC)
+	@echo "Building $(APP)..."
+	@go build -o $(APP) $(MAIN_PKG)
+	@echo "Build complete: ./$(APP)"
 
-rebuild:
-	rm -f $(APP)
-	go build -o $(APP) $(SRC)
+rebuild: clean build
+
 run: build
-	./$(APP)
+	@./$(APP)
 
 clean:
-	rm -f $(APP)
+	@echo "Cleaning..."
+	@rm -f $(APP)

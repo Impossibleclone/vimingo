@@ -1,4 +1,4 @@
-package main
+package core
 
 import "strings"
 
@@ -17,7 +17,7 @@ func YankRange(buffer *Buffer, cursor *Cursor, end int) {
 	if end >= len(toYankFromLine) {
 		end = len(toYankFromLine) - 1
 	}
-	toYankTheCharacters := []rune(toYankFromLine[start : end])
+	toYankTheCharacters := []rune(toYankFromLine[start:end])
 	buffer.Register = string(toYankTheCharacters)
 }
 
@@ -85,8 +85,7 @@ func RemoveLine(buffer *Buffer) {
 	}
 }
 
-
-func adjustScroll(buffer *Buffer, screenH int) {
+func AdjustScroll(buffer *Buffer, screenH int) {
 	textHeight := screenH - 1 // reserve bottom line
 
 	if buffer.Cursor.Y < buffer.ScrollY {

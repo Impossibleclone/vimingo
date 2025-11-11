@@ -1,11 +1,11 @@
-package main
+package core
 
 const TabStop = 4 // Define tab width for cursor movement consistency
 
 func isAlphabetorNumber(r rune) bool {
 	return (r >= 'A' && r <= 'Z') || (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9')
 }
-func wMotion(buffer *Buffer, cursor *Cursor) int {
+func WMotion(buffer *Buffer, cursor *Cursor) int {
 	line := buffer.Lines[cursor.Y]
 	var pos int
 	if pos+1 < len(line) {
@@ -28,8 +28,7 @@ func wMotion(buffer *Buffer, cursor *Cursor) int {
 	}
 }
 
-
-func eMotion(buffer *Buffer, cursor *Cursor) int {
+func EMotion(buffer *Buffer, cursor *Cursor) int {
 	line := buffer.Lines[cursor.Y]
 	pos := cursor.X
 
@@ -52,12 +51,12 @@ func eMotion(buffer *Buffer, cursor *Cursor) int {
 			return pos
 		}
 		//if after spaces and tabs there is a symbol go to it.
-		if !isAlphabetorNumber(rune(line[pos+1])){
-			return pos+1
+		if !isAlphabetorNumber(rune(line[pos+1])) {
+			return pos + 1
 		}
 	}
 	if pos < len(line)-1 && !isAlphabetorNumber(rune(line[pos])) {
-		//if on space or tab 
+		//if on space or tab
 		if line[pos] == ' ' || line[pos] == '\t' {
 
 			//for all spaces one after another
@@ -96,22 +95,22 @@ func eMotion(buffer *Buffer, cursor *Cursor) int {
 	return pos
 
 }
-func EMotion(buffer *Buffer, cursor *Cursor) int {
+func CapitalEMotion(buffer *Buffer, cursor *Cursor) int {
 	line := buffer.Lines[cursor.Y]
 	pos := cursor.X
 	if pos < len(line)-1 && line[pos+1] == ' ' {
 		pos++
 	}
-	if pos < len(line)-1 && line[pos+1] == '\t'{
-		pos+= TabStop
+	if pos < len(line)-1 && line[pos+1] == '\t' {
+		pos += TabStop
 	}
 	for x := pos; x < len(line)-1; x++ {
-		if x < len(line) && (line[x] == ' ' || line[x] == '\t'){
+		if x < len(line) && (line[x] == ' ' || line[x] == '\t') {
 			continue
 		}
-		if x < len(line) && (line[x+1] == ' ' || line[x+1] == '\t'){
+		if x < len(line) && (line[x+1] == ' ' || line[x+1] == '\t') {
 			return x
 		}
 	}
-	return len(line)-1
+	return len(line) - 1
 }

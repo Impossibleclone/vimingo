@@ -1,11 +1,13 @@
-package main
+package app
 
 import (
 	"fmt"
 	"strings"
+
+	"github.com/impossibleclone/vimingo/internal/core" // Imports the new core package
 )
 
-func (m *model) View() string {
+func (m *Model) View() string {
 	var b strings.Builder
 
 	screenW, screenH := m.width, m.height
@@ -29,14 +31,14 @@ func (m *model) View() string {
 		runes := []rune(m.buffer.Lines[lineIndex])
 		x := 0 // screen column
 		var lineBuilder strings.Builder
-		
-		prevReversed := false 
+
+		prevReversed := false
 
 		for rn := 0; rn < len(runes); rn++ {
 			r := runes[rn]
-			
-			inSel := m.mode.Current() == Visual && isInSelection(m.visualStart, *m.buffer.Cursor, rn, lineIndex)
-			
+
+			inSel := m.mode.Current() == core.Visual && core.IsInSelection(m.visualStart, *m.buffer.Cursor, rn, lineIndex) // Prefixed
+
 			isCursorPos := rn == m.buffer.Cursor.X && lineIndex == m.buffer.Cursor.Y
 
 			shouldReverse := inSel || isCursorPos
@@ -60,14 +62,14 @@ func (m *model) View() string {
 				x++
 			}
 		}
-		
+
 		if lineIndex == m.buffer.Cursor.Y && m.buffer.Cursor.X == len(runes) {
 			if !prevReversed {
 				lineBuilder.WriteString(ansiReverse) // Turn on reverse if not already on
 			}
-			lineBuilder.WriteRune(' ') // Draw the "block" cursor
+			lineBuilder.WriteRune(' ')           // Draw the "block" cursor
 			lineBuilder.WriteString(ansiReset)   // Immediately reset
-			prevReversed = false // We are now reset
+			prevReversed = false                 // We are now reset
 		}
 
 		if prevReversed {
@@ -79,14 +81,14 @@ func (m *model) View() string {
 	}
 
 	status := ""
-	if m.mode.Current() == Normal {
+	if m.mode.Current() == core.Normal { // Prefixed
 		status = " -- NORMAL -- " + m.buffer.Filename
-	} else if m.mode.Current() == Insert {
+	} else if m.mode.Current() == core.Insert { // Prefixed
 		status = " -- INSERT -- " + m.buffer.Filename
-	} else if m.mode.Current() == Command {
+	} else if m.mode.Current() == core.Command { // Prefixed
 		status = ":" + string(m.buffer.Command)
 	}
-	if m.buffer.StatusMsg != "" && m.mode.Current() != Command {
+	if m.buffer.StatusMsg != "" && m.mode.Current() != core.Command { // Prefixed
 		status += " | " + m.buffer.StatusMsg
 	}
 

@@ -53,40 +53,44 @@ Run the editor with or without a filename:
     ```
 
 ## ⌨️ Keybindings
-🟢 Normal Mode (Navigation)
 
+### 🟢 Normal Mode (Navigation)
 Use these keys to navigate the file.
 
-Key	                                                Action
-<kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd>	Left, Down, Up, Right
-<kbd>w</kbd>                                        Jump to start of next word
-<kbd>e</kbd>                                        Jump to end of current word
-<kbd>_</kbd>                                        Jump to start of line
-<kbd>$</kbd>                                        Jump to end of line
-<kbd>:</kbd>                                        Enter Command Mode
-<kbd>v</kbd>                                        Enter Visual Mode
+| Key | Action |
+| :--- | :--- |
+| <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd> | Left, Down, Up, Right |
+| <kbd>w</kbd> | Jump to start of next word |
+| <kbd>e</kbd> | Jump to end of current word |
+| <kbd>_</kbd> | Jump to start of line |
+| <kbd>$</kbd> | Jump to end of line |
+| <kbd>:</kbd> | Enter Command Mode |
+| <kbd>v</kbd> | Enter Visual Mode |
 
-🟡 Insert Mode triggers
+### 🟡 Insert Mode triggers
 
 Press <kbd>Esc</kbd> to exit Insert Mode.
-Key	Action
-<kbd>i</kbd>	Insert before cursor
-<kbd>a</kbd>	Insert after cursor
-<kbd>A</kbd>	Insert at end of line
-<kbd>o</kbd>	Open new line below
-<kbd>O</kbd>	Open new line above
 
-🟣 Visual Mode
+| Key | Action |
+| :--- | :--- |
+|  <kbd>i</kbd> | Insert before cursor |
+| <kbd>a</kbd>	| Insert after cursor |
+|<kbd>A</kbd>   | Insert at end of line |
+| <kbd>o</kbd>	| Open new line below |
+|<kbd>O</kbd>   | Open new line above |
+
+### 🟣 Visual Mode
 
 Press <kbd>v</kbd> in Normal mode to enter. Use navigation keys to highlight text.
 
-Key	Action
-<kbd>y</kbd>	Yank (Copy) highlighted text
-<kbd>x</kbd>	Cut highlighted text
-<kbd>c</kbd>	Change (Cut and enter Insert mode)
-<kbd>p</kbd>	Paste (works in Normal mode too)
+| Key | Action |
+| :--- | :--- |
+| <kbd>y</kbd> | Yank (copy) highlighted text |
+| <kbd>d</kbd> | Cut highlighted text |
+| <kbd>c</kbd> | Change highlighted text |
+| <kbd>p</kbd> | Paste (after cut or yank) |
 
-🔴 Command Mode
+### 🔴 Command Mode
 
 Press <kbd>:</kbd> in Normal mode to enter.
 

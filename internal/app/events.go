@@ -21,7 +21,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		return m, nil
 
-	// Handle key press events
+	// Handle key press events by the user.
 	case tea.KeyMsg:
 		quit := func() {
 			m.quit = true

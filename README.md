@@ -1,93 +1,113 @@
-**vimingo**
+**Vimingo**
 
-A simple terminal-based text editor written in Go using bubbletea.
-Features implemented till now:
+    A lightweight, modal text editor written in Go using the Bubble Tea framework.
 
-Insert and command modes (similar to Vim)
+Vimingo brings the core Vim experience to a custom-built Go TUI. It supports standard modes (Normal, Insert, Visual, Command), syntax highlighting basics, and file management, making it a great lightweight alternative or a learning resource for building complex TUIs in Go.
+✨ Features
 
-Basic editing: typing, deleting, new lines
+    Modal Editing: True Vim-like experience with Normal, Insert, Visual, and Command modes.
 
-Command mode supports saving (:w), quitting (:q), and saving & quitting (:wq)
+    Motions: Navigation using standard HJKL, word jumps, and line anchors.
 
-Scrolling support for large files
+    Visual Mode: Highlight text to yank (copy), cut, or change.
 
-Motion keys:
-    
-    h - Left
-    j - Down
-    k - Up
-    l - Right
-    w - Next word
-    e - End of Word
-    _ - Start of Line
-    $ - End of Line
+    File Operations: robust saving and quitting workflows via Command mode.
 
-A functional Status Line with Current Mode, File Name, Cursor Coordinates
+    Status Line: Real-time feedback on current mode, filename, and cursor coordinates.
 
-Installation
+    Performance: Efficient scrolling for large files.
 
-Clone the repo:
-
-    git clone https://github.com/impossibleclone/vimingo.git
-    cd vimingo
-    go mod tidy
-
-Install the project:
-
-    sudo make install 
-
-Run the editor:
-
-    ./vmg
-    ./vmg <filename>
-
-Usage
-
-Start the editor with a file name (existing or new).
-
-Press i to enter Insert mode and start typing.
-other mappings are also available like:
-
-    a to insert after cursor.
-
-    A to insert at the end of line.
-
-    o to insert at a new line below.
-
-    O to insert at a new line above.
-
-Use arrow keys or h, j, k, l to move cursor.
-
-Press Esc to switch back to Normal mode.
-
-Press v to switch to Visual mode:
-
-In Visual mode the motions can be used to highlight the text.
-
-    y to yank
-
-    x to cut
-
-    c to change
-
-    p to paste
-
-Press : to enter Command mode:
-
-    :w filename.ext
-
-    :w to save
-
-    :q to quit
-
-    :wq to save and quit
-
-	:line-number to navigate to that line. e.g. :10
-
-Dependencies
+📦 Installation
+Prerequisites
 
     Go 1.20+
 
-    bubbletea
+Build from Source
 
-Contributions are welcome! Feel free to open issues or pull requests.
+    Clone the repository:
+    Bash
+
+git clone https://github.com/impossibleclone/vimingo.git
+cd vimingo
+
+Install dependencies:
+Bash
+
+go mod tidy
+
+Build and Install:
+Bash
+
+    # Using Make (if available)
+    sudo make install
+
+    # OR manually build
+    go build -o vmg main.go
+
+🚀 Usage
+
+Run the editor with or without a filename:
+Bash
+
+    vmg
+    # OR
+    vmg filename.txt
+
+⌨️ Keybindings
+🟢 Normal Mode (Navigation)
+
+Use these keys to navigate the file.
+
+    Key	                                                Action
+    <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd>	Left, Down, Up, Right
+    <kbd>w</kbd>                                        Jump to start of next word
+    <kbd>e</kbd>                                        Jump to end of current word
+    <kbd>_</kbd>                                        Jump to start of line
+    <kbd>$</kbd>                                        Jump to end of line
+    <kbd>:</kbd>                                        Enter Command Mode
+    <kbd>v</kbd>                                        Enter Visual Mode
+
+🟡 Insert Mode triggers
+
+    Press <kbd>Esc</kbd> to exit Insert Mode.
+    Key	Action
+    <kbd>i</kbd>	Insert before cursor
+    <kbd>a</kbd>	Insert after cursor
+    <kbd>A</kbd>	Insert at end of line
+    <kbd>o</kbd>	Open new line below
+    <kbd>O</kbd>	Open new line above
+
+🟣 Visual Mode
+
+Press <kbd>v</kbd> in Normal mode to enter. Use navigation keys to highlight text.
+
+    Key	Action
+    <kbd>y</kbd>	Yank (Copy) highlighted text
+    <kbd>x</kbd>	Cut highlighted text
+    <kbd>c</kbd>	Change (Cut and enter Insert mode)
+    <kbd>p</kbd>	Paste (works in Normal mode too)
+
+🔴 Command Mode
+
+Press <kbd>:</kbd> in Normal mode to enter.
+
+    Command	Action
+    :w	Save file
+    :w <name>	Save as filename
+    :q	Quit (fails if changes are unsaved)
+    :wq	Save and Quit
+    :10	Jump to line 10 (replace with any number)
+
+🤝 Contributing
+
+Contributions are welcome! Whether it's fixing bugs, adding new motions, or improving the TUI rendering.
+
+    Fork the Project
+
+    Create your Feature Branch (git checkout -b feature/AmazingFeature)
+
+    Commit your Changes (git commit -m 'Add some AmazingFeature')
+
+    Push to the Branch (git push origin feature/AmazingFeature)
+
+    Open a Pull Request

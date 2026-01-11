@@ -43,7 +43,7 @@
     sudo make install
 
     # OR manually build
-    go build -o vmg main.go
+    go build -o vmg ./cmd/vmg
     ```
 
 ## 🚀 Usage

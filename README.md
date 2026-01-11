@@ -104,10 +104,10 @@ Press <kbd>:</kbd> in Normal mode to enter.
 ## 📝 Notes
 
 * The editor is modal, meaning you can't enter Insert Mode while in Visual Mode or Command Mode.
-:w <name>	Save as filename
-:q	Quit (fails if changes are unsaved)
-:wq	Save and Quit
-:10	Jump to line 10 (replace with any number)
+- :w [filename]	Save as filename
+- :q	Quit (fails if changes are unsaved)
+- :wq	Save and Quit
+- :10	Jump to line 10 (replace with any number)
 
 🤝 Contributing
 

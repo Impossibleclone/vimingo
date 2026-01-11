@@ -28,7 +28,7 @@
 
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/impossibleclone/vimingo.git](https://github.com/impossibleclone/vimingo.git)
+    git clone https://github.com/impossibleclone/vimingo.git
     cd vimingo
     ```
 

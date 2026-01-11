@@ -46,13 +46,13 @@
 
 Run the editor with or without a filename:
 
-```bash
+    ```bash
     ./vmg
     # OR
     ./vmg filename.txt
     ```
 
-⌨️ Keybindings
+## ⌨️ Keybindings
 🟢 Normal Mode (Navigation)
 
 Use these keys to navigate the file.

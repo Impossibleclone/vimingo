@@ -94,8 +94,16 @@ Press <kbd>v</kbd> in Normal mode to enter. Use navigation keys to highlight tex
 
 Press <kbd>:</kbd> in Normal mode to enter.
 
-Command	Action
-:w	Save file
+| Command | Action |
+| :--- | :--- |
+| <kbd>:w</kbd> | Save current file |
+| <kbd>:wq</kbd> | Save and quit |
+| <kbd>:q</kbd> | Quit |
+| <kbd>:[number]</kbd> | Jump to line number |
+
+## 📝 Notes
+
+* The editor is modal, meaning you can't enter Insert Mode while in Visual Mode or Command Mode.
 :w <name>	Save as filename
 :q	Quit (fails if changes are unsaved)
 :wq	Save and Quit

@@ -6,6 +6,10 @@
 
 ![Go Version](https://img.shields.io/badge/Go-1.20%2B-cyan.svg) ![Status](https://img.shields.io/badge/status-active-green)
 
+![Project Screenshot](./ss/demo1.png)
+![Project Screenshot](./ss/demo2.png)
+![Project Screenshot](./ss/demo3.png)
+
 ## ✨ Features
 
 * **Modal Editing:** True Vim-like experience with Normal, Insert, Visual, and Command modes.

@@ -86,7 +86,7 @@ Press <kbd>v</kbd> in Normal mode to enter. Use navigation keys to highlight tex
 | Key | Action |
 | :--- | :--- |
 | <kbd>y</kbd> | Yank (copy) highlighted text |
-| <kbd>d</kbd> | Cut highlighted text |
+| <kbd>d</kbd> | Delete highlighted text |
 | <kbd>c</kbd> | Change highlighted text |
 | <kbd>p</kbd> | Paste (after cut or yank) |
 

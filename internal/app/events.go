@@ -37,9 +37,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case tea.KeyCtrlD:
 				m.cursor.HalfDown(m.buffer, m.height)
 				core.AdjustScroll(m.buffer, screenH) // Prefixed
+
 			case tea.KeyCtrlU:
 				m.cursor.HalfUp(m.buffer, m.height)
 				core.AdjustScroll(m.buffer, screenH) // Prefixed
+
 			case tea.KeyDelete:
 				m.buffer.Register = string(m.buffer.Lines[m.cursor.Y][m.cursor.X])
 				m.buffer.Lines[m.cursor.Y] = core.RemoveCh(m.buffer.Lines[m.cursor.Y], m.cursor.X) // Prefixed
@@ -51,6 +53,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				case 'v':
 					m.visualStart = *m.cursor
 					m.mode.SwitchTo(core.Visual) // Prefixed
+				case 'V':
+					m.cursor.X = 0
+					m.visualStart = *m.cursor
+					m.mode.SwitchTo(core.Visual)
+					m.cursor.X = len(m.buffer.Lines[m.cursor.Y])
 				case 'p':
 					core.Paste(m.buffer, m.buffer.Register) // Prefixed
 				case 'i':
@@ -213,10 +220,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.mode.SwitchTo(core.Normal)                           // Prefixed
 				case 'x':
 					core.CutSelection(m.buffer, m.cursor, &m.visualStart) // Prefixed
-					m.mode.SwitchTo(core.Normal)                         // Prefixed
+					m.mode.SwitchTo(core.Normal)                          // Prefixed
 				case 'c':
 					core.CutSelection(m.buffer, m.cursor, &m.visualStart) // Prefixed
-					m.mode.SwitchTo(core.Insert)                         // Prefixed
+					m.mode.SwitchTo(core.Insert)                          // Prefixed
 				case ':':
 					m.mode.SwitchTo(core.Command) // Prefixed
 					m.buffer.Command = nil
@@ -244,7 +251,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 			case tea.KeyEnter:
-				cmds := strings.Fields(string(m.buffer.Command))
+				rawCmd := strings.TrimPrefix(strings.TrimSpace(string(m.buffer.Command)), ":")
+				cmds := strings.Fields(rawCmd)
 
 				if len(cmds) == 0 {
 					m.mode.SwitchTo(core.Normal) // Prefixed
@@ -270,10 +278,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				switch cmds[0] {
 				case "w":
 					if len(cmds) > 1 {
-						if err := core.SaveFile(cmds[1], m.buffer); err != nil { // Prefixed
+						filename := strings.Join(cmds[1:], " ")
+						if err := core.SaveFile(filename, m.buffer); err != nil { // Prefixed
 							m.buffer.StatusMsg = err.Error()
 						} else {
-							m.buffer.Filename = cmds[1]
+							m.buffer.Filename = filename
 							m.buffer.StatusMsg = "Written " + m.buffer.Filename
 						}
 					} else {
@@ -290,11 +299,16 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					quit()
 
 				case "wq":
-					if err := core.SaveFile(m.buffer.Filename, m.buffer); err != nil { // Prefixed
+					filename := m.buffer.Filename
+					if len(cmds) > 1 {
+						filename = strings.Join(cmds[1:], " ")
+					}
+					if err := core.SaveFile(filename, m.buffer); err != nil { // Prefixed
 						m.buffer.StatusMsg = err.Error()
 						m.mode.SwitchTo(core.Normal) // Prefixed
 						m.buffer.Command = nil
 					} else {
+						m.buffer.Filename = filename
 						m.buffer.StatusMsg = "Written " + m.buffer.Filename
 						quit()
 					}
@@ -303,6 +317,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			case tea.KeyEscape:
 				m.mode.SwitchTo(core.Normal) // Prefixed
+
+			case tea.KeySpace:
+				m.buffer.Command = append(m.buffer.Command, ' ')
+
 			case tea.KeyRunes:
 				r := msg.Runes[0] //preserve the typed character
 				m.buffer.Command = append(m.buffer.Command, r)

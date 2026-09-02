@@ -9,7 +9,7 @@ all: build
 install: build
 	@echo "Installing $(APP) to $(PREFIX)..."
 	@mv $(APP) $(PREFIX)
-	@echo "Done! You may need sudo."
+	@echo "Done! or You may need sudo."
 
 build:
 	@echo "Building $(APP)..."
